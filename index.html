@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SiteForge — Construction Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#0e0c0a;--s1:#141210;--s2:#1a1714;--card:#1e1b17;--card2:#252118;
+  --border:#2a2520;--border2:#362f26;
+  --or:#e8650a;--or2:#c5520a;--or3:#ff8c3a;
+  --ye:#f5b800;--ye2:#e0a800;
+  --st:#8a9ba8;--st2:#6b7d8a;
+  --red:#e03c3c;--gr:#2db87a;--gr2:#25a06a;--sky:#3a9fd4;
+  --text:#e8e0d5;--muted:#5a5048;--muted2:#7a6e62;
+  --r:8px;--r2:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+header{background:linear-gradient(180deg,#080705,var(--s1));border-bottom:2px solid var(--or2);padding:0 20px;display:flex;align-items:stretch;position:sticky;top:0;z-index:100;min-height:54px;}
+.hlogo{display:flex;align-items:center;gap:12px;padding:10px 18px 10px 0;border-right:1px solid var(--border2);margin-right:14px;}
+.hlogo-mark{width:38px;height:38px;background:var(--or);clip-path:polygon(0 0,100% 0,100% 75%,75% 100%,0 100%);display:grid;place-items:center;font-size:1.1rem;flex-shrink:0;}
+.hlogo h1{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:#fff;letter-spacing:2px;}
+.hlogo p{font-size:.52rem;color:var(--or);letter-spacing:3px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;}
+.hcenter{flex:1;display:flex;align-items:center;gap:7px;overflow-x:auto;scrollbar-width:none;padding:8px 0;}
+.hcenter::-webkit-scrollbar{display:none;}
+.ppill{flex-shrink:0;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);padding:4px 11px;cursor:pointer;transition:all .18s;}
+.ppill:hover,.ppill.active{border-color:var(--or);background:rgba(232,101,10,.1);}
+.ppill-name{font-size:.75rem;font-weight:600;}
+.ppill-prog{font-size:.57rem;color:var(--or);font-family:'IBM Plex Mono',monospace;}
+.hright{display:flex;align-items:center;gap:9px;padding:8px 0 8px 14px;border-left:1px solid var(--border2);margin-left:auto;flex-shrink:0;}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--gr);animation:blink 2s infinite;}
+.ldot.off{background:var(--red);animation:none;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.ltxt{font-size:.6rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace;}
+.htime{text-align:right;}
+.hdate{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--ye);letter-spacing:1px;display:block;}
+.hclock{font-size:.58rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace;}
+
+.ribbon{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;}
+.ribbon::-webkit-scrollbar{display:none;}
+.rc{flex-shrink:0;padding:7px 15px;border-right:1px solid var(--border);}
+.rc-label{font-size:.52rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-family:'IBM Plex Mono',monospace;}
+.rc-val{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:1px;margin-top:1px;}
+.or{color:var(--or3)}.ye{color:var(--ye)}.gr{color:var(--gr)}.rd{color:var(--red)}.st{color:var(--st)}
+
+nav{background:var(--s2);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;}
+nav::-webkit-scrollbar{display:none;}
+.nb{background:none;border:none;border-bottom:3px solid transparent;color:var(--muted2);padding:11px 13px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-size:.82rem;font-weight:500;white-space:nowrap;transition:all .18s;}
+.nb:hover{color:var(--text);}
+.nb.active{color:var(--or);border-bottom-color:var(--or);font-weight:600;}
+
+main{padding:18px;max-width:1300px;margin:0 auto;}
+.tab{display:none;animation:fi .2s ease;}
+.tab.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.sec{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--or);letter-spacing:2px;display:flex;align-items:center;gap:9px;margin-bottom:13px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px;}
+.sbox{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;position:relative;overflow:hidden;}
+.sbox::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.sbox.or::after{background:var(--or);}.sbox.ye::after{background:var(--ye);}.sbox.gr::after{background:var(--gr);}.sbox.rd::after{background:var(--red);}.sbox.st::after{background:var(--st);}
+.sl{font-size:.55rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:3px;}
+.sv{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;line-height:1;}
+.sv.or{color:var(--or3)}.sv.ye{color:var(--ye)}.sv.gr{color:var(--gr)}.sv.rd{color:var(--red)}.sv.st{color:var(--st)}
+.ss{font-size:.58rem;color:var(--muted);margin-top:2px;}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+@media(max-width:720px){.g2{grid-template-columns:1fr}main{padding:11px}}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:15px;}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--or);letter-spacing:2px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:11px;margin-bottom:16px;}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;transition:all .2s;cursor:pointer;}
+.pcard:hover{border-color:var(--or2);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.4);}
+.pcard-top{padding:13px 15px;background:linear-gradient(135deg,var(--card2),var(--card));border-bottom:1px solid var(--border);}
+.pcard-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:#fff;letter-spacing:1px;}
+.pcard-loc{font-size:.68rem;color:var(--muted2);margin-top:2px;}
+.pcard-body{padding:13px 15px;}
+.pcard-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px;}
+.pcard-mi{background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:5px 8px;}
+.pcard-mi-l{font-size:.52rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:'IBM Plex Mono',monospace;}
+.pcard-mi-v{font-size:.78rem;font-weight:600;margin-top:1px;}
+
+.pbar{height:7px;background:var(--border);border-radius:2px;overflow:hidden;}
+.pbar-fill{height:100%;background:linear-gradient(90deg,var(--or2),var(--or3));border-radius:2px;transition:width .7s ease;}
+
+.task-card{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:var(--r);padding:11px 13px;margin-bottom:7px;display:flex;gap:10px;align-items:flex-start;transition:all .18s;}
+.task-card.p-urgent{border-left-color:var(--red);}.task-card.p-high{border-left-color:var(--or);}.task-card.p-medium{border-left-color:var(--ye);}.task-card.p-low{border-left-color:var(--st);}
+.tcheck{width:19px;height:19px;border-radius:4px;border:1.5px solid var(--border2);background:var(--s2);display:grid;place-items:center;flex-shrink:0;cursor:pointer;transition:all .18s;font-size:.72rem;}
+.tcheck.done{background:var(--gr);border-color:var(--gr);color:#000;}
+.tinfo{flex:1;}
+.tname{font-weight:600;font-size:.83rem;}
+.tname.done{text-decoration:line-through;color:var(--muted);}
+.tsub{font-size:.66rem;color:var(--muted2);margin-top:2px;}
+.tright{text-align:right;flex-shrink:0;}
+.tdue{font-size:.63rem;font-family:'IBM Plex Mono',monospace;color:var(--muted2);}
+.tdue.late{color:var(--red);}
+
+.wrow{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:10px 13px;display:flex;gap:10px;align-items:center;margin-bottom:7px;transition:border .18s;}
+.wrow:hover{border-color:var(--border2);}
+.wav{width:35px;height:35px;border-radius:6px;background:var(--or);clip-path:polygon(0 0,100% 0,100% 75%,75% 100%,0 100%);display:grid;place-items:center;font-family:'Bebas Neue',sans-serif;font-size:.85rem;color:#000;letter-spacing:1px;flex-shrink:0;}
+
+.issue-row{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:var(--r);padding:11px 13px;margin-bottom:7px;}
+.issue-title{font-weight:600;font-size:.83rem;}
+.issue-meta{display:flex;gap:9px;margin-top:4px;font-size:.66rem;color:var(--muted2);flex-wrap:wrap;}
+
+.tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);margin-bottom:13px;}
+table{width:100%;border-collapse:collapse;}
+thead{background:#0a0806;}
+th{padding:8px 11px;text-align:left;font-size:.57rem;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;white-space:nowrap;font-family:'IBM Plex Mono',monospace;border-bottom:1px solid var(--border);}
+td{padding:9px 11px;border-top:1px solid var(--border);font-size:.8rem;vertical-align:middle;}
+tr:hover td{background:rgba(255,255,255,.01);}
+
+.frow{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:9px;}
+.fg{flex:1;min-width:125px;display:flex;flex-direction:column;gap:4px;}
+label{font-size:.57rem;color:var(--muted2);letter-spacing:1.2px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);color:var(--text);padding:7px 10px;font-family:'IBM Plex Sans',sans-serif;font-size:.83rem;outline:none;transition:border .18s;}
+input:focus,select:focus,textarea:focus{border-color:var(--or2);}
+select option{background:var(--s1);}
+textarea{resize:vertical;min-height:58px;line-height:1.5;}
+input[type=range]{padding:3px 0;accent-color:var(--or);}
+
+.btn{padding:7px 15px;border-radius:var(--r);border:none;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-size:.83rem;font-weight:600;transition:all .18s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.btn-or{background:var(--or);color:#000;}.btn-or:hover{background:var(--or3);}
+.btn-gr{background:var(--gr);color:#000;}.btn-gr:hover{background:var(--gr2);}
+.btn-rd{background:var(--red);color:#fff;}
+.btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border);}.btn-ghost:hover{border-color:var(--or2);}
+.btn-sm{padding:5px 10px;font-size:.74rem;}
+.btn-xs{padding:2px 7px;font-size:.68rem;}
+
+.badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:.63rem;font-weight:600;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.5px;}
+.b-or{background:rgba(232,101,10,.15);color:var(--or3);}
+.b-ye{background:rgba(245,184,0,.12);color:var(--ye);}
+.b-gr{background:rgba(45,184,122,.12);color:var(--gr);}
+.b-rd{background:rgba(224,60,60,.12);color:var(--red);}
+.b-st{background:rgba(138,155,168,.1);color:var(--st);}
+.b-sky{background:rgba(58,159,212,.12);color:var(--sky);}
+
+.mbd{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:14px;}
+.mbd.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--border2);border-top:3px solid var(--or);border-radius:var(--r2);padding:20px;width:100%;max-width:510px;box-shadow:0 28px 70px rgba(0,0,0,.7);animation:mIn .2s ease;max-height:92vh;overflow-y:auto;}
+@keyframes mIn{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+.mtitle{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;color:var(--or);letter-spacing:2px;margin-bottom:15px;}
+.mactions{display:flex;gap:7px;justify-content:flex-end;margin-top:15px;flex-wrap:wrap;}
+
+.phase-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px;}
+.phase-btn{background:var(--s2);border:1.5px solid var(--border);border-radius:5px;padding:5px 9px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:600;color:var(--muted2);transition:all .18s;text-transform:uppercase;letter-spacing:.5px;}
+.phase-btn:hover,.phase-btn.sel{border-color:var(--or);color:var(--or);background:rgba(232,101,10,.08);}
+
+.frow-act{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;flex-wrap:wrap;gap:9px;}
+.filter-row{display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap;}
+.filter-row input,.filter-row select{flex:1;min-width:115px;max-width:185px;}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--or);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader{display:flex;align-items:center;justify-content:center;padding:24px;gap:8px;color:var(--muted);font-size:.79rem;}
+.empty{text-align:center;padding:28px;color:var(--muted);}
+.empty-i{font-size:2rem;opacity:.2;display:block;margin-bottom:6px;}
+#toast{position:fixed;bottom:14px;right:13px;background:var(--or);color:#000;padding:9px 17px;border-radius:var(--r);font-weight:700;font-size:.83rem;opacity:0;transform:translateY(10px);transition:all .25s;pointer-events:none;z-index:9999;box-shadow:0 6px 22px rgba(0,0,0,.5);font-family:'IBM Plex Mono',monospace;}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.t-gr{background:var(--gr);color:#000;}
+#toast.t-rd{background:var(--red);color:#fff;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hlogo">
+    <div class="hlogo-mark">🏗</div>
+    <div><h1 id="bizTitle">SITEFORGE</h1><p>Construction Manager</p></div>
+  </div>
+  <div class="hcenter" id="projPills">
+    <div style="font-size:.68rem;color:var(--muted);white-space:nowrap">No projects yet</div>
+  </div>
+  <div class="hright">
+    <div class="ldot" id="ldot"></div>
+    <div class="ltxt" id="lstatus">connecting</div>
+    <div class="htime"><span class="hdate" id="hDate"></span><span class="hclock" id="hClock"></span></div>
+  </div>
+</header>
+
+<div class="ribbon">
+  <div class="rc"><div class="rc-label">🏗 Projects</div><div class="rc-val or" id="rb1">—</div></div>
+  <div class="rc"><div class="rc-label">📋 Tasks</div><div class="rc-val ye" id="rb2">—</div></div>
+  <div class="rc"><div class="rc-label">✅ Done</div><div class="rc-val gr" id="rb3">—</div></div>
+  <div class="rc"><div class="rc-label">⚠ Issues</div><div class="rc-val rd" id="rb4">—</div></div>
+  <div class="rc"><div class="rc-label">👷 Workers</div><div class="rc-val st" id="rb5">—</div></div>
+  <div class="rc"><div class="rc-label">💰 Budget Used</div><div class="rc-val ye" id="rb6">—</div></div>
+</div>
+
+<nav>
+  <button class="nb active" onclick="go('dash',this)">📊 Dashboard</button>
+  <button class="nb" onclick="go('projects',this)">🏗 Projects</button>
+  <button class="nb" onclick="go('tasks',this)">📋 Tasks</button>
+  <button class="nb" onclick="go('workers',this)">👷 Workers</button>
+  <button class="nb" onclick="go('materials',this)">🧱 Materials</button>
+  <button class="nb" onclick="go('budget',this)">💰 Budget</button>
+  <button class="nb" onclick="go('issues',this)">⚠ Issues</button>
+  <button class="nb" onclick="go('photos',this)">📷 Updates</button>
+  <button class="nb" onclick="go('reports',this)">📈 Reports</button>
+  <button class="nb" onclick="go('setup',this)">⚙ Setup</button>
+</nav>
+
+<main>
+
+<!-- DASHBOARD -->
+<div class="tab active" id="tab-dash">
+  <div id="dashAlerts"></div>
+  <div class="sg" id="dashSg"></div>
+  <div class="g2">
+    <div>
+      <div class="sec">🏗 Active Projects</div>
+      <div id="dashProjects"></div>
+    </div>
+    <div>
+      <div class="sec">📋 Urgent Tasks</div>
+      <div id="dashTasks"></div>
+      <div class="sec" style="margin-top:15px">⚠ Open Issues</div>
+      <div id="dashIssues"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<div class="tab" id="tab-projects">
+  <div class="frow-act">
+    <div class="sec" style="margin:0">🏗 All Projects</div>
+    <button class="btn btn-or" onclick="om('mAddProj')">＋ New Project</button>
+  </div>
+  <div class="filter-row">
+    <input id="projSrch" placeholder="🔍 Search…" oninput="renderProjects()">
+    <select id="projFSt" onchange="renderProjects()">
+      <option value="">All Status</option>
+      <option value="planning">Planning</option>
+      <option value="active">Active</option>
+      <option value="on_hold">On Hold</option>
+      <option value="completed">Completed</option>
+    </select>
+  </div>
+  <div class="pgrid" id="projGrid"></div>
+</div>
+
+<!-- TASKS -->
+<div class="tab" id="tab-tasks">
+  <div class="frow-act">
+    <div class="sec" style="margin:0">📋 Tasks</div>
+    <button class="btn btn-or" onclick="om('mAddTask')">＋ Add Task</button>
+  </div>
+  <div class="filter-row">
+    <select id="taskFP"><option value="">All Projects</option></select>
+    <select id="taskFS">
+      <option value="">All Status</option>
+      <option value="pending">Pending</option>
+      <option value="in_progress">In Progress</option>
+      <option value="done">Done</option>
+      <option value="blocked">Blocked</option>
+    </select>
+    <select id="taskFPri">
+      <option value="">All Priority</option>
+      <option value="urgent">Urgent</option>
+      <option value="high">High</option>
+      <option value="medium">Medium</option>
+      <option value="low">Low</option>
+    </select>
+    <button class="btn btn-ghost btn-sm" onclick="loadTasks()">🔍</button>
+  </div>
+  <div id="taskList"></div>
+</div>
+
+<!-- WORKERS -->
+<div class="tab" id="tab-workers">
+  <div class="frow-act">
+    <div class="sec" style="margin:0">👷 Workers</div>
+    <button class="btn btn-or" onclick="om('mAddWorker')">＋ Add Worker</button>
+  </div>
+  <div class="filter-row">
+    <input id="workerSrch" placeholder="🔍 Name or role…" oninput="renderWorkers()">
+    <select id="workerFP" onchange="renderWorkers()"><option value="">All Projects</option></select>
+  </div>
+  <div class="sg" id="workerSg"></div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Project</th><th>Daily Rate</th><th>Days</th><th>Total Earned</th><th>Status</th><th></th></tr></thead>
+      <tbody id="workerTb"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MATERIALS -->
+<div class="tab" id="tab-materials">
+  <div class="frow-act">
+    <div class="sec" style="margin:0">🧱 Materials</div>
+    <button class="btn btn-or" onclick="om('mAddMat')">＋ Log Material</button>
+  </div>
+  <div class="filter-row">
+    <select id="matFP"><option value="">All Projects</option></select>
+    <select id="matFC">
+      <option value="">All Categories</option>
+      <option value="cement">Cement</option><option value="steel">Steel</option>
+      <option value="timber">Timber</option><option value="sand">Sand/Ballast</option>
+      <option value="blocks">Blocks/Bricks</option><option value="roofing">Roofing</option>
+      <option value="plumbing">Plumbing</option><option value="electrical">Electrical</option>
+      <option value="finishing">Finishing</option><option value="other">Other</option>
+    </select>
+    <button class="btn btn-ghost btn-sm" onclick="loadMaterials()">🔍</button>
+  </div>
+  <div class="sg" id="matSg"></div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Date</th><th>Material</th><th>Category</th><th>Project</th><th>Qty</th><th>Unit</th><th>Unit Cost</th><th>Total</th><th>Supplier</th><th></th></tr></thead>
+      <tbody id="matTb"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- BUDGET -->
+<div class="tab" id="tab-budget">
+  <div class="sec">💰 Budget Tracker</div>
+  <div class="sg" id="budgetSg"></div>
+  <div class="g2">
+    <div class="card"><div class="card-title">💰 By Project</div><div id="budByProj"></div></div>
+    <div class="card"><div class="card-title">🧱 By Material Category</div><div id="budByCat"></div></div>
+  </div>
+</div>
+
+<!-- ISSUES -->
+<div class="tab" id="tab-issues">
+  <div class="frow-act">
+    <div class="sec" style="margin:0">⚠ Issues</div>
+    <button class="btn btn-or" onclick="om('mAddIssue')">＋ Log Issue</button>
+  </div>
+  <div class="filter-row">
+    <select id="issFP"><option value="">All Projects</option></select>
+    <select id="issFS">
+      <option value="">All</option>
+      <option value="open">Open</option>
+      <option value="in_progress">In Progress</option>
+      <option value="resolved">Resolved</option>
+    </select>
+    <button class="btn btn-ghost btn-sm" onclick="loadIssues()">🔍</button>
+  </div>
+  <div class="sg" id="issSg"></div>
+  <div id="issueList"></div>
+</div>
+
+<!-- PHOTOS/UPDATES -->
+<div class="tab" id="tab-photos">
+  <div class="frow-act">
+    <div class="sec" style="margin:0">📷 Progress Updates</div>
+    <button class="btn btn-or" onclick="om('mAddPhoto')">＋ Add Update</button>
+  </div>
+  <div class="filter-row">
+    <select id="photoFP"><option value="">All Projects</option></select>
+    <button class="btn btn-ghost btn-sm" onclick="loadPhotos()">🔍</button>
+  </div>
+  <div id="photoList"></div>
+</div>
+
+<!-- REPORTS -->
+<div class="tab" id="tab-reports">
+  <div class="sec">📈 Reports</div>
+  <div class="sg" id="repSg"></div>
+  <div class="g2">
+    <div class="card"><div class="card-title">📊 Project Progress</div><div id="repProg"></div></div>
+    <div class="card"><div class="card-title">💰 Monthly Spend — Last 6 Months</div>
+      <div style="display:flex;align-items:flex-end;gap:5px;height:110px;padding:5px 0" id="repChart"></div>
+    </div>
+  </div>
+  <div class="g2" style="margin-top:13px">
+    <div class="card"><div class="card-title">👷 Workers by Project</div><div id="repWorkers"></div></div>
+    <div class="card"><div class="card-title">🧱 Top Material Spend</div><div id="repMats"></div></div>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="tab" id="tab-setup">
+  <div class="sec">⚙ Setup</div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">🏢 Company Info</div>
+      <div class="fg" style="margin-bottom:9px"><label>Company Name</label><input id="sBiz" placeholder="e.g. Kamau Builders Ltd"></div>
+      <div class="fg" style="margin-bottom:9px"><label>Site Manager</label><input id="sMgr" placeholder="Manager name"></div>
+      <div class="fg" style="margin-bottom:9px"><label>Phone</label><input id="sPh" placeholder="07XX XXX XXX"></div>
+      <div class="fg" style="margin-bottom:13px"><label>Location</label><input id="sLoc" placeholder="Nairobi, Kenya"></div>
+      <button class="btn btn-or" onclick="saveSett()">💾 Save</button>
+    </div>
+    <div class="card">
+      <div class="card-title">🗄️ SQL — Run in Supabase</div>
+      <p style="font-size:.73rem;color:var(--muted);margin-bottom:9px;line-height:1.5">Copy and paste this in your Supabase SQL Editor to create all tables:</p>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:10px;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--or3);line-height:1.8;overflow:auto;white-space:pre;max-height:270px" id="sqlOut"></div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%" onclick="cpSql()">📋 Copy SQL</button>
+    </div>
+  </div>
+</div>
+</main>
+
+<!-- MODALS -->
+
+<div class="mbd" id="mAddProj">
+  <div class="modal">
+    <div class="mtitle">🏗 NEW PROJECT</div>
+    <div class="frow">
+      <div class="fg"><label>Project Name *</label><input id="pjN" placeholder="e.g. Westlands 4BR Bungalow"></div>
+      <div class="fg"><label>Client</label><input id="pjCl" placeholder="Client / Owner"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Location *</label><input id="pjLoc" placeholder="e.g. Kilimani, Nairobi"></div>
+      <div class="fg"><label>Type</label>
+        <select id="pjTyp"><option value="residential">Residential</option><option value="commercial">Commercial</option><option value="renovation">Renovation</option><option value="infrastructure">Infrastructure</option><option value="industrial">Industrial</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Start Date</label><input type="date" id="pjSD"></div>
+      <div class="fg"><label>Target End Date</label><input type="date" id="pjED"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Total Budget (KSh)</label><input type="number" id="pjBgt" placeholder="5000000"></div>
+      <div class="fg"><label>Status</label>
+        <select id="pjSt"><option value="active">Active</option><option value="planning">Planning</option><option value="on_hold">On Hold</option></select>
+      </div>
+    </div>
+    <label style="font-size:.57rem;color:var(--muted2);letter-spacing:1.2px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;display:block;margin-bottom:6px">Current Phase</label>
+    <div class="phase-row" id="phaseRow">
+      <div class="phase-btn sel" onclick="selPhase(this,'foundation')">Foundation</div>
+      <div class="phase-btn" onclick="selPhase(this,'walling')">Walling</div>
+      <div class="phase-btn" onclick="selPhase(this,'roofing')">Roofing</div>
+      <div class="phase-btn" onclick="selPhase(this,'plumbing')">Plumbing</div>
+      <div class="phase-btn" onclick="selPhase(this,'electrical')">Electrical</div>
+      <div class="phase-btn" onclick="selPhase(this,'plastering')">Plastering</div>
+      <div class="phase-btn" onclick="selPhase(this,'finishing')">Finishing</div>
+      <div class="phase-btn" onclick="selPhase(this,'handover')">Handover</div>
+    </div>
+    <div class="fg" style="margin-bottom:9px">
+      <label>Overall Progress: <span id="progVal">0</span>%</label>
+      <input type="range" id="pjProg" min="0" max="100" value="0" oninput="document.getElementById('progVal').textContent=this.value">
+    </div>
+    <div class="fg" style="margin-bottom:10px"><label>Notes</label><textarea id="pjNo" placeholder="Project details…"></textarea></div>
+    <div class="mactions">
+      <button class="btn btn-ghost btn-sm" onclick="cm('mAddProj')">Cancel</button>
+      <button class="btn btn-or" onclick="saveProj()">🏗 Save Project</button>
+    </div>
+  </div>
+</div>
+
+<div class="mbd" id="mAddTask">
+  <div class="modal">
+    <div class="mtitle">📋 ADD TASK</div>
+    <div class="frow">
+      <div class="fg"><label>Task Name *</label><input id="tkN" placeholder="e.g. Pour ground floor slab"></div>
+      <div class="fg"><label>Project *</label><select id="tkP"><option value="">-- Select --</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Assigned To</label><input id="tkAss" placeholder="Worker name"></div>
+      <div class="fg"><label>Phase</label>
+        <select id="tkPh"><option value="foundation">Foundation</option><option value="walling">Walling</option><option value="roofing">Roofing</option><option value="plumbing">Plumbing</option><option value="electrical">Electrical</option><option value="plastering">Plastering</option><option value="finishing">Finishing</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Due Date</label><input type="date" id="tkDue"></div>
+      <div class="fg"><label>Priority</label>
+        <select id="tkPri"><option value="medium">Medium</option><option value="low">Low</option><option value="high">High</option><option value="urgent">🚨 Urgent</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Est. Cost (KSh)</label><input type="number" id="tkCost" placeholder="0"></div>
+      <div class="fg"><label>Status</label><select id="tkSt"><option value="pending">Pending</option><option value="in_progress">In Progress</option><option value="blocked">Blocked</option></select></div>
+    </div>
+    <div class="fg" style="margin-bottom:10px"><label>Notes</label><textarea id="tkNo" placeholder="Details…"></textarea></div>
+    <div class="mactions">
+      <button class="btn btn-ghost btn-sm" onclick="cm('mAddTask')">Cancel</button>
+      <button class="btn btn-or" onclick="saveTask()">📋 Save Task</button>
+    </div>
+  </div>
+</div>
+
+<div class="mbd" id="mAddWorker">
+  <div class="modal">
+    <div class="mtitle">👷 ADD WORKER</div>
+    <div class="frow">
+      <div class="fg"><label>Full Name *</label><input id="wkN" placeholder="Full name"></div>
+      <div class="fg"><label>Phone</label><input type="tel" id="wkPh" placeholder="07XX XXX XXX"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Role / Trade *</label>
+        <select id="wkRole"><option value="foreman">Foreman</option><option value="mason">Mason / Fundi</option><option value="carpenter">Carpenter</option><option value="plumber">Plumber</option><option value="electrician">Electrician</option><option value="painter">Painter</option><option value="labourer">Labourer</option><option value="driver">Driver / Operator</option><option value="contractor">Contractor</option><option value="other">Other</option></select>
+      </div>
+      <div class="fg"><label>Project</label><select id="wkP"><option value="">-- Select --</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Daily Rate (KSh)</label><input type="number" id="wkRate" placeholder="1500"></div>
+      <div class="fg"><label>Days Worked</label><input type="number" id="wkDays" value="0" min="0"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>National ID</label><input id="wkID" placeholder="ID Number"></div>
+      <div class="fg"><label>Start Date</label><input type="date" id="wkSD"></div>
+    </div>
+    <div class="mactions">
+      <button class="btn btn-ghost btn-sm" onclick="cm('mAddWorker')">Cancel</button>
+      <button class="btn btn-or" onclick="saveWorker()">👷 Save Worker</button>
+    </div>
+  </div>
+</div>
+
+<div class="mbd" id="mAddMat">
+  <div class="modal">
+    <div class="mtitle">🧱 LOG MATERIAL</div>
+    <div class="frow">
+      <div class="fg"><label>Material *</label><input id="mtN" placeholder="e.g. OPC Cement 50kg bags"></div>
+      <div class="fg"><label>Category</label>
+        <select id="mtCat"><option value="cement">Cement</option><option value="steel">Steel</option><option value="timber">Timber</option><option value="sand">Sand/Ballast</option><option value="blocks">Blocks/Bricks</option><option value="roofing">Roofing</option><option value="plumbing">Plumbing</option><option value="electrical">Electrical</option><option value="finishing">Finishing</option><option value="other">Other</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Project *</label><select id="mtP"><option value="">-- Select --</option></select></div>
+      <div class="fg"><label>Purchase Date</label><input type="date" id="mtDt"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Quantity</label><input type="number" id="mtQty" placeholder="0" oninput="calcMat()"></div>
+      <div class="fg"><label>Unit</label>
+        <select id="mtUnit"><option value="bags">Bags</option><option value="tonnes">Tonnes</option><option value="pieces">Pieces</option><option value="metres">Metres</option><option value="loads">Loads</option><option value="kg">KG</option><option value="sqm">Sq Metres</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Unit Cost (KSh)</label><input type="number" id="mtUC" placeholder="0" oninput="calcMat()"></div>
+      <div class="fg"><label>Total (auto)</label><input type="number" id="mtTC" readonly style="color:var(--or3)"></div>
+    </div>
+    <div class="fg" style="margin-bottom:10px"><label>Supplier</label><input id="mtSup" placeholder="Supplier name or shop"></div>
+    <div class="mactions">
+      <button class="btn btn-ghost btn-sm" onclick="cm('mAddMat')">Cancel</button>
+      <button class="btn btn-or" onclick="saveMat()">🧱 Save Material</button>
+    </div>
+  </div>
+</div>
+
+<div class="mbd" id="mAddIssue">
+  <div class="modal">
+    <div class="mtitle">⚠ LOG ISSUE</div>
+    <div class="frow">
+      <div class="fg"><label>Issue Title *</label><input id="isN" placeholder="e.g. Crack in ground floor slab"></div>
+      <div class="fg"><label>Project</label><select id="isP"><option value="">-- Select --</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Reported By</label><input id="isRep" placeholder="Name"></div>
+      <div class="fg"><label>Severity</label>
+        <select id="isSev"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="critical">🚨 Critical</option></select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Impact Cost (KSh)</label><input type="number" id="isImp" placeholder="0"></div>
+      <div class="fg"><label>Assigned To</label><input id="isAss" placeholder="Who will fix this"></div>
+    </div>
+    <div class="fg" style="margin-bottom:10px"><label>Description</label><textarea id="isDes" placeholder="Describe the issue…"></textarea></div>
+    <div class="mactions">
+      <button class="btn btn-ghost btn-sm" onclick="cm('mAddIssue')">Cancel</button>
+      <button class="btn btn-or" onclick="saveIssue()">⚠ Log Issue</button>
+    </div>
+  </div>
+</div>
+
+<div class="mbd" id="mAddPhoto">
+  <div class="modal">
+    <div class="mtitle">📷 PROGRESS UPDATE</div>
+    <div class="frow">
+      <div class="fg"><label>Project</label><select id="phP"><option value="">-- Select --</option></select></div>
+      <div class="fg"><label>Date</label><input type="date" id="phDt"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Phase</label>
+        <select id="phPh"><option value="foundation">Foundation</option><option value="walling">Walling</option><option value="roofing">Roofing</option><option value="plumbing">Plumbing</option><option value="electrical">Electrical</option><option value="plastering">Plastering</option><option value="finishing">Finishing</option></select>
+      </div>
+      <div class="fg"><label>Progress % Today</label><input type="number" id="phProg" min="0" max="100" placeholder="45"></div>
+    </div>
+    <div class="fg" style="margin-bottom:9px"><label>Update Notes *</label><textarea id="phNote" placeholder="What was done today…"></textarea></div>
+    <div class="fg" style="margin-bottom:10px"><label>Photo URL (optional)</label><input id="phImg" placeholder="https://…"></div>
+    <div class="mactions">
+      <button class="btn btn-ghost btn-sm" onclick="cm('mAddPhoto')">Cancel</button>
+      <button class="btn btn-or" onclick="savePhoto()">📷 Save Update</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SB_URL='https://rgpuequojgsxpfxvsizu.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJncHVlcXVvamdzeHBmeHZzaXp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzcxODksImV4cCI6MjA4NzcxMzE4OX0.UXBPaUu6Yz_SwsVIprqvEh3zL2hBy3BHxl9L_8xGzbE';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+let projects=[],tasks=[],workers=[],materials=[],issues=[],photos=[];
+let sett={biz:'SiteForge',mgr:'',ph:'',loc:''};
+let curPhase='foundation';
+
+const pad=n=>String(n).padStart(2,'0');
+const today=()=>{const d=new Date();return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;};
+const KSH=v=>`KSh ${Number(v||0).toLocaleString('en-KE',{maximumFractionDigits:0})}`;
+const PC={foundation:'#e8650a',walling:'#f5b800',roofing:'#3a9fd4',plumbing:'#8a9ba8',electrical:'#f5b800',plastering:'#2db87a',finishing:'#e8650a',handover:'#2db87a'};
+
+function tick(){const n=new Date();document.getElementById('hDate').textContent=n.toLocaleDateString('en-KE',{weekday:'short',day:'numeric',month:'short'}).toUpperCase();document.getElementById('hClock').textContent=n.toLocaleTimeString('en-KE');}
+setInterval(tick,1000);tick();
+
+const online=()=>{document.getElementById('ldot').className='ldot';document.getElementById('lstatus').textContent='LIVE';};
+const offline=()=>{document.getElementById('ldot').className='ldot off';document.getElementById('lstatus').textContent='OFFLINE';};
+function toast(msg,t=''){const e=document.getElementById('toast');e.textContent=msg;e.className='';if(t==='gr')e.classList.add('t-gr');else if(t==='rd')e.classList.add('t-rd');e.classList.add('show');setTimeout(()=>e.classList.remove('show'),3000);}
+const om=id=>document.getElementById(id).classList.add('open');
+const cm=id=>document.getElementById(id).classList.remove('open');
+const pname=id=>{const p=projects.find(x=>x.id===id||x.id==id);return p?p.name:'—';};
+
+function fillSels(){
+  const o=projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  ['tkP','wkP','mtP','isP','phP'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML='<option value="">-- Select --</option>'+o;});
+  ['taskFP','workerFP','matFP','issFP','photoFP'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML='<option value="">All Projects</option>'+o;});
+}
+
+function go(name,btn){
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(e=>e.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  ({dash:renderDash,projects:renderProjects,tasks:loadTasks,workers:renderWorkers,materials:loadMaterials,budget:renderBudget,issues:loadIssues,photos:loadPhotos,reports:renderReports,setup:renderSetup}[name]||Function)();
+}
+
+function selPhase(el,ph){curPhase=ph;document.querySelectorAll('.phase-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');}
+
+function updateRibbon(){
+  const active=projects.filter(p=>p.status==='active').length;
+  const done=tasks.filter(t=>t.status==='done').length;
+  const openI=issues.filter(i=>i.status!=='resolved').length;
+  const totalB=projects.reduce((s,p)=>s+(p.budget||0),0);
+  const totalS=materials.reduce((s,m)=>s+(m.total_cost||0),0)+workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
+  const bPct=totalB?Math.round(totalS/totalB*100):0;
+  document.getElementById('rb1').textContent=active+' active';
+  document.getElementById('rb2').textContent=tasks.length;
+  document.getElementById('rb3').textContent=done;
+  document.getElementById('rb4').textContent=openI;
+  document.getElementById('rb5').textContent=workers.length;
+  document.getElementById('rb6').textContent=bPct+'%';
+  document.getElementById('projPills').innerHTML=projects.slice(0,5).map(p=>`<div class="ppill"><div class="ppill-name">${p.name.slice(0,22)}</div><div class="ppill-prog">${p.progress||0}% · ${p.phase||'planning'}</div></div>`).join('')||'<div style="font-size:.68rem;color:var(--muted);padding:4px 0">No projects yet</div>';
+}
+
+// DASHBOARD
+function renderDash(){
+  updateRibbon();
+  const active=projects.filter(p=>p.status==='active').length;
+  const done=tasks.filter(t=>t.status==='done').length;
+  const pending=tasks.filter(t=>t.status!=='done').length;
+  const openI=issues.filter(i=>i.status!=='resolved').length;
+  const totalS=materials.reduce((s,m)=>s+(m.total_cost||0),0)+workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
+  const totalB=projects.reduce((s,p)=>s+(p.budget||0),0);
+  const avgProg=projects.length?Math.round(projects.reduce((s,p)=>s+(p.progress||0),0)/projects.length):0;
+  document.getElementById('dashSg').innerHTML=[
+    {l:'Active Projects',v:active,s:'Running',c:'or',cls:'or'},
+    {l:'Tasks Pending',v:pending,s:'Not done',c:'ye',cls:'ye'},
+    {l:'Tasks Done',v:done,s:'Completed',c:'gr',cls:'gr'},
+    {l:'Open Issues',v:openI,s:'Unresolved',c:'rd',cls:'rd'},
+    {l:'Avg Progress',v:avgProg+'%',s:'All projects',c:'or',cls:'or'},
+    {l:'Total Spend',v:KSH(totalS),s:'Budget: '+KSH(totalB),c:'ye',cls:'ye'},
+  ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
+
+  const al=[];
+  const delayed=projects.filter(p=>p.end_date&&new Date(p.end_date)<new Date()&&p.status==='active');
+  if(delayed.length)al.push(`🚨 ${delayed.length} project${delayed.length>1?'s':''} past deadline`);
+  const crit=issues.filter(i=>i.severity==='critical'&&i.status!=='resolved');
+  if(crit.length)al.push(`⚠ ${crit.length} critical issue${crit.length>1?'s':''} unresolved`);
+  const overDue=tasks.filter(t=>t.due_date&&new Date(t.due_date)<new Date()&&t.status!=='done');
+  if(overDue.length)al.push(`📋 ${overDue.length} task${overDue.length>1?'s':''} overdue`);
+  document.getElementById('dashAlerts').innerHTML=al.map(m=>`<div style="background:rgba(224,60,60,.08);border:1px solid rgba(224,60,60,.25);color:var(--red);border-radius:7px;padding:8px 12px;font-size:.79rem;font-weight:600;margin-bottom:7px">${m}</div>`).join('');
+
+  document.getElementById('dashProjects').innerHTML=projects.filter(p=>p.status==='active').slice(0,4).map(p=>`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <div><div style="font-weight:600;font-size:.84rem">${p.name}</div><div style="font-size:.64rem;color:var(--muted2)">📍 ${p.location||'—'} · <span style="color:var(--or)">${p.phase||'—'}</span></div></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--or3)">${p.progress||0}%</div>
+      </div>
+      <div class="pbar"><div class="pbar-fill" style="width:${p.progress||0}%"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:.6rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace"><span>${p.start_date||'—'} → ${p.end_date||'—'}</span><span>${KSH(p.budget)}</span></div>
+    </div>`).join('')||'<div class="empty"><span class="empty-i">🏗</span>No active projects</div>';
+
+  const urg=tasks.filter(t=>t.status!=='done'&&(t.priority==='urgent'||t.priority==='high')).slice(0,4);
+  document.getElementById('dashTasks').innerHTML=urg.length?urg.map(t=>`
+    <div class="task-card p-${t.priority}">
+      <div class="tcheck ${t.status==='done'?'done':''}" onclick="toggleTask(${t.id})">${t.status==='done'?'✓':''}</div>
+      <div class="tinfo">
+        <div class="tname ${t.status==='done'?'done':''}">${t.name}</div>
+        <div class="tsub">${pname(t.project_id)} · ${t.phase||'—'} · ${t.assigned_to||'Unassigned'}</div>
+      </div>
+      <div class="tright">
+        <div class="tdue ${t.due_date&&new Date(t.due_date)<new Date()?'late':''}">${t.due_date||'—'}</div>
+        <span class="badge b-${t.priority==='urgent'?'rd':'or'}">${t.priority}</span>
+      </div>
+    </div>`).join(''):'<div class="empty" style="padding:13px"><span class="empty-i">📋</span>No urgent tasks</div>';
+
+  document.getElementById('dashIssues').innerHTML=issues.filter(i=>i.status!=='resolved').slice(0,4).map(i=>`
+    <div class="issue-row">
+      <div class="issue-title">${i.title}</div>
+      <div class="issue-meta">
+        <span>${pname(i.project_id)}</span>
+        <span class="badge b-${i.severity==='critical'?'rd':i.severity==='high'?'or':'ye'}">${i.severity}</span>
+        <span>${i.date||'—'}</span>
+      </div>
+    </div>`).join('')||'<div class="empty" style="padding:13px"><span class="empty-i">⚠</span>No open issues</div>';
+}
+
+// PROJECTS
+function renderProjects(){
+  const q=(document.getElementById('projSrch')?.value||'').toLowerCase();
+  const fs=document.getElementById('projFSt')?.value||'';
+  let list=projects;
+  if(q)list=list.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.location||'').toLowerCase().includes(q));
+  if(fs)list=list.filter(p=>p.status===fs);
+  document.getElementById('projGrid').innerHTML=list.length?list.map(p=>{
+    const col=PC[p.phase]||'#e8650a';
+    const pT=tasks.filter(t=>t.project_id===p.id);
+    const dT=pT.filter(t=>t.status==='done').length;
+    const pW=workers.filter(w=>w.project_id===p.id).length;
+    const pS=materials.filter(m=>m.project_id===p.id).reduce((s,m)=>s+(m.total_cost||0),0)+workers.filter(w=>w.project_id===p.id).reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
+    const bP=p.budget?Math.min(100,Math.round(pS/p.budget*100)):0;
+    return`<div class="pcard">
+      <div class="pcard-top">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="pcard-name">${p.name}</div>
+            <div class="pcard-loc">📍 ${p.location||'—'} · ${p.type||'residential'} · Client: ${p.client||'—'}</div>
+          </div>
+          <span class="badge ${p.status==='active'?'b-gr':p.status==='completed'?'b-sky':p.status==='on_hold'?'b-ye':'b-st'}">${p.status}</span>
+        </div>
+        <div style="margin-top:9px;display:flex;align-items:flex-end;gap:5px">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:var(--or3);letter-spacing:2px;line-height:1">${p.progress||0}%</span>
+          <span style="font-size:.55rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:3px">COMPLETE</span>
+        </div>
+        <div class="pbar" style="margin-top:5px"><div class="pbar-fill" style="width:${p.progress||0}%;background:linear-gradient(90deg,${col}99,${col})"></div></div>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-meta">
+          <div class="pcard-mi"><div class="pcard-mi-l">Phase</div><div class="pcard-mi-v" style="color:${col};font-size:.75rem">${p.phase||'—'}</div></div>
+          <div class="pcard-mi"><div class="pcard-mi-l">Budget</div><div class="pcard-mi-v" style="color:var(--ye);font-size:.73rem">${KSH(p.budget)}</div></div>
+          <div class="pcard-mi"><div class="pcard-mi-l">Budget Used</div><div class="pcard-mi-v" style="color:${bP>80?'var(--red)':'var(--or3)'};font-size:.75rem">${bP}%</div></div>
+          <div class="pcard-mi"><div class="pcard-mi-l">Tasks</div><div class="pcard-mi-v" style="font-size:.75rem">${dT}/${pT.length}</div></div>
+          <div class="pcard-mi"><div class="pcard-mi-l">Workers</div><div class="pcard-mi-v" style="font-size:.75rem">${pW}</div></div>
+          <div class="pcard-mi"><div class="pcard-mi-l">Dates</div><div class="pcard-mi-v" style="font-size:.65rem">${p.start_date||'—'}</div></div>
+        </div>
+        <div style="display:flex;gap:5px;margin-top:9px;flex-wrap:wrap">
+          <button class="btn btn-or btn-xs" onclick="updProg(${p.id})">📊 Update %</button>
+          <button class="btn btn-ghost btn-xs" onclick="updPhase(${p.id})">🔄 Phase</button>
+          <button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delProj(${p.id})">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join(''):`<div style="grid-column:1/-1"><div class="empty"><span class="empty-i">🏗</span>No projects found</div></div>`;
+}
+
+async function updProg(id){
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  const v=prompt(`Progress for "${p.name}" (current: ${p.progress||0}%)\nEnter 0-100:`);
+  if(v===null)return;const pct=Math.max(0,Math.min(100,parseInt(v)||0));
+  try{await sb.from('construction_projects').update({progress:pct}).eq('id',id);}catch(e){}
+  p.progress=pct;renderProjects();renderDash();toast(`📊 ${p.name} → ${pct}%`,'gr');
+}
+async function updPhase(id){
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  const phases=['foundation','walling','roofing','plumbing','electrical','plastering','finishing','handover'];
+  const v=prompt(`Phase for "${p.name}" (current: ${p.phase||'foundation'})\nOptions: ${phases.join(', ')}`);
+  if(!v||!phases.includes(v.toLowerCase()))return;
+  const ph=v.toLowerCase();
+  try{await sb.from('construction_projects').update({phase:ph}).eq('id',id);}catch(e){}
+  p.phase=ph;renderProjects();toast(`🔄 Phase → ${ph}`,'gr');
+}
+async function delProj(id){
+  if(!confirm('Delete project?'))return;
+  try{await sb.from('construction_projects').delete().eq('id',id);}catch(e){}
+  projects=projects.filter(p=>p.id!==id);renderProjects();updateRibbon();toast('Deleted','rd');
+}
+
+// TASKS
+async function loadTasks(){
+  document.getElementById('taskList').innerHTML='<div class="loader"><div class="spin"></div>Loading…</div>';
+  try{
+    let q=sb.from('construction_tasks').select('*').order('id',{ascending:false});
+    const pp=document.getElementById('taskFP')?.value;const ss=document.getElementById('taskFS')?.value;const pr=document.getElementById('taskFPri')?.value;
+    if(pp)q=q.eq('project_id',parseInt(pp));if(ss)q=q.eq('status',ss);if(pr)q=q.eq('priority',pr);
+    const{data,error}=await q;if(error)throw error;tasks=data||[];renderTaskList(data||[]);online();
+  }catch(e){renderTaskList(tasks);offline();}
+}
+function renderTaskList(list){
+  document.getElementById('taskList').innerHTML=list.length?list.map(t=>`
+    <div class="task-card p-${t.priority}">
+      <div class="tcheck ${t.status==='done'?'done':''}" onclick="toggleTask(${t.id})">${t.status==='done'?'✓':''}</div>
+      <div class="tinfo">
+        <div class="tname ${t.status==='done'?'done':''}">${t.name}</div>
+        <div class="tsub">${pname(t.project_id)} · ${t.phase||'—'} · 👷 ${t.assigned_to||'Unassigned'}${t.cost?' · '+KSH(t.cost):''}</div>
+      </div>
+      <div class="tright">
+        <div class="tdue ${t.due_date&&new Date(t.due_date)<new Date()&&t.status!=='done'?'late':''}">${t.due_date||'—'}</div>
+        <div style="display:flex;gap:3px;justify-content:flex-end;margin-top:3px">
+          <span class="badge b-${t.priority==='urgent'?'rd':t.priority==='high'?'or':'ye'}">${t.priority}</span>
+          <span class="badge b-${t.status==='done'?'gr':t.status==='in_progress'?'sky':t.status==='blocked'?'rd':'st'}">${t.status}</span>
+        </div>
+        <button class="btn btn-ghost btn-xs" style="margin-top:4px;color:var(--red)" onclick="delTask(${t.id})">🗑</button>
+      </div>
+    </div>`).join(''):'<div class="empty"><span class="empty-i">📋</span>No tasks found</div>';
+}
+async function toggleTask(id){
+  const t=tasks.find(x=>x.id===id);if(!t)return;const ns=t.status==='done'?'in_progress':'done';
+  try{await sb.from('construction_tasks').update({status:ns}).eq('id',id);}catch(e){}
+  t.status=ns;loadTasks();toast(ns==='done'?'✅ Done!':'↩ Reopened');
+}
+async function delTask(id){
+  if(!confirm('Delete?'))return;try{await sb.from('construction_tasks').delete().eq('id',id);}catch(e){}
+  tasks=tasks.filter(t=>t.id!==id);loadTasks();toast('Deleted','rd');
+}
+
+// WORKERS
+function renderWorkers(){
+  const q=(document.getElementById('workerSrch')?.value||'').toLowerCase();
+  const pp=document.getElementById('workerFP')?.value||'';
+  let list=workers;
+  if(q)list=list.filter(w=>(w.name||'').toLowerCase().includes(q)||(w.role||'').toLowerCase().includes(q));
+  if(pp)list=list.filter(w=>w.project_id==pp);
+  const tp=workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
+  document.getElementById('workerSg').innerHTML=[
+    {l:'Total Workers',v:workers.length,s:'All projects',c:'or',cls:'or'},
+    {l:'Total Payroll',v:KSH(tp),s:'All time',c:'ye',cls:'ye'},
+  ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
+  document.getElementById('workerTb').innerHTML=list.length?list.map(w=>{
+    const earned=(w.daily_rate||0)*(w.days_worked||0);
+    return`<tr>
+      <td><div style="font-weight:600">${w.name}</div><div style="font-size:.65rem;color:var(--muted2)">${w.id_number||'—'}</div></td>
+      <td><span class="badge b-or">${w.role}</span></td>
+      <td style="font-size:.72rem">${w.phone||'—'}</td>
+      <td>${pname(w.project_id)}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;color:var(--ye)">${KSH(w.daily_rate)}</td>
+      <td style="font-family:'Bebas Neue',sans-serif">${w.days_worked||0}</td>
+      <td style="font-family:'Bebas Neue',sans-serif;color:var(--gr)">${KSH(earned)}</td>
+      <td><span class="badge b-gr">${w.status||'active'}</span></td>
+      <td><button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delWorker(${w.id})">🗑</button></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="9"><div class="empty"><span class="empty-i">👷</span>No workers</div></td></tr>';
+}
+async function delWorker(id){
+  if(!confirm('Remove?'))return;try{await sb.from('construction_workers').delete().eq('id',id);}catch(e){}
+  workers=workers.filter(w=>w.id!==id);renderWorkers();toast('Removed','rd');
+}
+
+// MATERIALS
+async function loadMaterials(){
+  document.getElementById('matTb').innerHTML='<tr><td colspan="10"><div class="loader"><div class="spin"></div></div></td></tr>';
+  try{
+    let q=sb.from('construction_materials').select('*').order('id',{ascending:false});
+    const pp=document.getElementById('matFP')?.value;const cc=document.getElementById('matFC')?.value;
+    if(pp)q=q.eq('project_id',parseInt(pp));if(cc)q=q.eq('category',cc);
+    const{data,error}=await q;if(error)throw error;materials=data||[];renderMatTb(data||[]);renderMatSg();online();
+  }catch(e){renderMatTb(materials);offline();}
+}
+function renderMatTb(list){
+  document.getElementById('matTb').innerHTML=list.length?list.map(m=>`<tr>
+    <td style="font-size:.7rem;font-family:'IBM Plex Mono',monospace">${m.date||'—'}</td>
+    <td style="font-weight:600">${m.name}</td>
+    <td><span class="badge b-or">${m.category}</span></td>
+    <td>${pname(m.project_id)}</td>
+    <td style="font-family:'Bebas Neue',sans-serif">${m.qty||0}</td>
+    <td style="color:var(--muted2);font-size:.73rem">${m.unit||'—'}</td>
+    <td style="font-family:'Bebas Neue',sans-serif;color:var(--ye)">${KSH(m.unit_cost)}</td>
+    <td style="font-family:'Bebas Neue',sans-serif;color:var(--gr)">${KSH(m.total_cost)}</td>
+    <td style="color:var(--muted2);font-size:.73rem">${m.supplier||'—'}</td>
+    <td><button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delMat(${m.id})">🗑</button></td>
+  </tr>`).join(''):'<tr><td colspan="10"><div class="empty"><span class="empty-i">🧱</span>No materials</div></td></tr>';
+}
+function renderMatSg(){
+  const total=materials.reduce((s,m)=>s+(m.total_cost||0),0);
+  const cement=materials.filter(m=>m.category==='cement').reduce((s,m)=>s+(m.total_cost||0),0);
+  const steel=materials.filter(m=>m.category==='steel').reduce((s,m)=>s+(m.total_cost||0),0);
+  document.getElementById('matSg').innerHTML=[
+    {l:'Total Materials',v:KSH(total),s:'All purchases',c:'ye',cls:'ye'},
+    {l:'Cement',v:KSH(cement),s:'Cement spend',c:'or',cls:'or'},
+    {l:'Steel',v:KSH(steel),s:'Steel spend',c:'st',cls:'st'},
+  ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
+}
+function calcMat(){const q=parseFloat(document.getElementById('mtQty')?.value)||0;const uc=parseFloat(document.getElementById('mtUC')?.value)||0;const tc=document.getElementById('mtTC');if(tc)tc.value=q*uc;}
+async function delMat(id){
+  if(!confirm('Delete?'))return;try{await sb.from('construction_materials').delete().eq('id',id);}catch(e){}
+  materials=materials.filter(m=>m.id!==id);loadMaterials();toast('Deleted','rd');
+}
+
+// BUDGET
+function renderBudget(){
+  const tB=projects.reduce((s,p)=>s+(p.budget||0),0);
+  const mC=materials.reduce((s,m)=>s+(m.total_cost||0),0);
+  const lC=workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
+  const tS=mC+lC;const rem=tB-tS;const pct=tB?Math.min(100,Math.round(tS/tB*100)):0;
+  document.getElementById('budgetSg').innerHTML=[
+    {l:'Total Budget',v:KSH(tB),s:'All projects',c:'ye',cls:'ye'},
+    {l:'Total Spent',v:KSH(tS),s:'Mat + Labour',c:'or',cls:'or'},
+    {l:'Remaining',v:KSH(Math.max(0,rem)),s:'Available',c:'gr',cls:'gr'},
+    {l:'% Used',v:pct+'%',s:'Utilization',c:pct>85?'rd':'ye',cls:pct>85?'rd':'ye'},
+    {l:'Materials',v:KSH(mC),s:'Procurement',c:'or',cls:'or'},
+    {l:'Labour',v:KSH(lC),s:'Payroll',c:'st',cls:'st'},
+  ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
+  document.getElementById('budByProj').innerHTML=projects.map(p=>{
+    const sp=materials.filter(m=>m.project_id===p.id).reduce((s,m)=>s+(m.total_cost||0),0)+workers.filter(w=>w.project_id===p.id).reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
+    const pp=p.budget?Math.min(100,Math.round(sp/p.budget*100)):0;
+    return`<div style="margin-bottom:11px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px"><div style="font-size:.79rem;font-weight:600">${p.name}</div><div style="font-size:.68rem;font-family:'IBM Plex Mono',monospace;color:var(--muted2)">${KSH(sp)} / ${KSH(p.budget)}</div></div>
+      <div style="height:9px;background:var(--border);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pp}%;background:linear-gradient(90deg,${pp>85?'var(--red)':pp>60?'var(--or2)':'var(--gr2)'},${pp>85?'#ff6b6b':pp>60?'var(--or3)':'var(--gr)'});border-radius:2px;transition:width .7s"></div></div>
+      <div style="font-size:.58rem;color:var(--muted);margin-top:2px;font-family:'IBM Plex Mono',monospace">${pp}% of budget used</div>
+    </div>`;
+  }).join('')||'<div class="empty"><span class="empty-i">💰</span>No projects</div>';
+  const cats=['cement','steel','timber','sand','blocks','roofing','plumbing','electrical','finishing','other'];
+  const cd=cats.map(c=>({c,v:materials.filter(m=>m.category===c).reduce((s,m)=>s+(m.total_cost||0),0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+  const maxC=Math.max(...cd.map(x=>x.v),1);
+  document.getElementById('budByCat').innerHTML=cd.map(x=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <div style="min-width:85px;font-size:.7rem;color:var(--muted2)">${x.c}</div>
+      <div style="flex:1;background:var(--border);border-radius:2px;height:9px;overflow:hidden"><div style="height:100%;width:${(x.v/maxC*100).toFixed(1)}%;background:linear-gradient(90deg,var(--or2),var(--or3));border-radius:2px;transition:width .7s"></div></div>
+      <div style="min-width:82px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:.88rem;color:var(--or3)">${KSH(x.v)}</div>
+    </div>`).join('')||'<div class="empty"><span class="empty-i">🧱</span>No data</div>';
+}
+
+// ISSUES
+async function loadIssues(){
+  document.getElementById('issueList').innerHTML='<div class="loader"><div class="spin"></div>Loading…</div>';
+  try{
+    let q=sb.from('construction_issues').select('*').order('id',{ascending:false});
+    const pp=document.getElementById('issFP')?.value;const ss=document.getElementById('issFS')?.value;
+    if(pp)q=q.eq('project_id',parseInt(pp));if(ss)q=q.eq('status',ss);
+    const{data,error}=await q;if(error)throw error;issues=data||[];renderIssueList(data||[]);renderIssSg();online();
+  }catch(e){renderIssueList(issues);offline();}
+}
+function renderIssueList(list){
+  document.getElementById('issueList').innerHTML=list.length?list.map(i=>`
+    <div class="issue-row" style="border-left-color:${i.severity==='critical'?'var(--red)':i.severity==='high'?'var(--or)':i.severity==='medium'?'var(--ye)':'var(--st)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="issue-title">${i.title}</div>
+        <div style="display:flex;gap:4px;flex-shrink:0;margin-left:9px">
+          <span class="badge b-${i.severity==='critical'?'rd':i.severity==='high'?'or':i.severity==='medium'?'ye':'st'}">${i.severity}</span>
+          <span class="badge b-${i.status==='resolved'?'gr':i.status==='in_progress'?'sky':'rd'}">${i.status}</span>
+        </div>
+      </div>
+      ${i.description?`<div style="font-size:.73rem;color:var(--muted2);margin-top:4px">${i.description}</div>`:''}
+      <div class="issue-meta">
+        <span>🏗 ${pname(i.project_id)}</span><span>👤 ${i.reporter||'—'}</span>
+        ${i.assigned_to?`<span>🔧 ${i.assigned_to}</span>`:''}
+        ${i.impact?`<span>💰 ${KSH(i.impact)}</span>`:''}
+        <span>📅 ${i.date||'—'}</span>
+      </div>
+      <div style="margin-top:7px;display:flex;gap:5px">
+        ${i.status!=='resolved'?`<button class="btn btn-gr btn-xs" onclick="resolveIssue(${i.id})">✓ Resolve</button>`:''}
+        <button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delIssue(${i.id})">🗑</button>
+      </div>
+    </div>`).join(''):'<div class="empty"><span class="empty-i">⚠</span>No issues found</div>';
+}
+function renderIssSg(){
+  const open=issues.filter(i=>i.status==='open').length;const inp=issues.filter(i=>i.status==='in_progress').length;
+  const res=issues.filter(i=>i.status==='resolved').length;const crit=issues.filter(i=>i.severity==='critical'&&i.status!=='resolved').length;
+  document.getElementById('issSg').innerHTML=[
+    {l:'Open',v:open,s:'Awaiting fix',c:'rd',cls:'rd'},{l:'In Progress',v:inp,s:'Being fixed',c:'or',cls:'or'},
+    {l:'Resolved',v:res,s:'Fixed',c:'gr',cls:'gr'},{l:'Critical',v:crit,s:'Urgent',c:'rd',cls:'rd'},
+  ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
+}
+async function resolveIssue(id){
+  try{await sb.from('construction_issues').update({status:'resolved'}).eq('id',id);}catch(e){}
+  const i=issues.find(x=>x.id===id);if(i)i.status='resolved';loadIssues();renderDash();toast('✅ Resolved!','gr');
+}
+async function delIssue(id){
+  if(!confirm('Delete?'))return;try{await sb.from('construction_issues').delete().eq('id',id);}catch(e){}
+  issues=issues.filter(i=>i.id!==id);loadIssues();toast('Deleted','rd');
+}
+
+// PHOTOS
+async function loadPhotos(){
+  try{
+    let q=sb.from('construction_photos').select('*').order('id',{ascending:false});
+    const pp=document.getElementById('photoFP')?.value;if(pp)q=q.eq('project_id',parseInt(pp));
+    const{data,error}=await q;if(error)throw error;photos=data||[];renderPhotoList(data||[]);online();
+  }catch(e){renderPhotoList(photos);offline();}
+}
+function renderPhotoList(list){
+  document.getElementById('photoList').innerHTML=list.length?list.map(p=>`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin-bottom:11px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--or3);letter-spacing:1px">${pname(p.project_id)}</div>
+          <div style="font-size:.66rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace">${p.date||'—'} · Phase: ${p.phase||'—'}${p.progress_pct?` · ${p.progress_pct}% done`:''}</div>
+        </div>
+        <button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delPhoto(${p.id})">🗑</button>
+      </div>
+      <div style="font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:7px">${p.notes||'—'}</div>
+      ${p.image_url?`<div style="font-size:.7rem;color:var(--sky);font-family:'IBM Plex Mono',monospace">📷 ${p.image_url}</div>`:''}
+    </div>`).join(''):'<div class="empty"><span class="empty-i">📷</span>No updates yet</div>';
+}
+async function delPhoto(id){
+  if(!confirm('Delete?'))return;try{await sb.from('construction_photos').delete().eq('id',id);}catch(e){}
+  photos=photos.filter(p=>p.id!==id);loadPhotos();toast('Deleted','rd');
+}
+
+// REPORTS
+function renderReports(){
+  const tB=projects.reduce((s,p)=>s+(p.budget||0),0);
+  const tS=materials.reduce((s,m)=>s+(m.total_cost||0),0)+workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
+  const avg=projects.length?Math.round(projects.reduce((s,p)=>s+(p.progress||0),0)/projects.length):0;
+  document.getElementById('repSg').innerHTML=[
+    {l:'Projects',v:projects.length,s:'Total',c:'or',cls:'or'},
+    {l:'Avg Progress',v:avg+'%',s:'All projects',c:'ye',cls:'ye'},
+    {l:'Total Budget',v:KSH(tB),s:'All projects',c:'ye',cls:'ye'},
+    {l:'Total Spent',v:KSH(tS),s:'Actual',c:'or',cls:'or'},
+  ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
+  document.getElementById('repProg').innerHTML=projects.map(p=>`
+    <div style="margin-bottom:11px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px"><div style="font-size:.79rem;font-weight:600">${p.name}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:.93rem;color:var(--or3)">${p.progress||0}%</div></div>
+      <div class="pbar"><div class="pbar-fill" style="width:${p.progress||0}%"></div></div>
+      <div style="font-size:.58rem;color:var(--muted);margin-top:2px">${p.phase||'—'} · ${p.status}</div>
+    </div>`).join('')||'<div class="empty"><span class="empty-i">🏗</span>No projects</div>';
+  const months=[];for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);months.push({lbl:d.toLocaleDateString('en-KE',{month:'short'}).toUpperCase(),m:d.getMonth(),y:d.getFullYear()});}
+  const mV=months.map(mo=>materials.filter(m=>{const d=new Date(m.date);return d.getMonth()===mo.m&&d.getFullYear()===mo.y;}).reduce((s,m)=>s+(m.total_cost||0),0));
+  const maxM=Math.max(...mV,1);
+  document.getElementById('repChart').innerHTML=months.map((mo,i)=>{const v=mV[i];const h=Math.max(3,(v/maxM*108)).toFixed(1);return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="font-size:.55rem;color:var(--or3);font-family:'IBM Plex Mono',monospace">${v>0?Math.round(v/1000)+'k':''}</div><div style="width:100%;background:linear-gradient(180deg,var(--or2),var(--or3));border-radius:2px 2px 0 0;min-height:3px;height:${h}px"></div><div style="font-size:.55rem;color:var(--muted);font-family:'IBM Plex Mono',monospace">${mo.lbl}</div></div>`;}).join('');
+  const byP={};workers.forEach(w=>{const n=pname(w.project_id);byP[n]=(byP[n]||0)+1;});
+  const maxW=Math.max(...Object.values(byP),1);
+  document.getElementById('repWorkers').innerHTML=Object.entries(byP).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><div style="min-width:115px;font-size:.7rem;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n}</div><div style="flex:1;background:var(--border);border-radius:2px;height:9px;overflow:hidden"><div style="height:100%;width:${(v/maxW*100).toFixed(1)}%;background:linear-gradient(90deg,var(--or2),var(--or3));border-radius:2px"></div></div><div style="min-width:28px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:.93rem;color:var(--or3)">${v}</div></div>`).join('')||'<div class="empty"><span class="empty-i">👷</span>No data</div>';
+  const cD={};materials.forEach(m=>{cD[m.category]=(cD[m.category]||0)+(m.total_cost||0);});
+  const maxC=Math.max(...Object.values(cD),1);
+  document.getElementById('repMats').innerHTML=Object.entries(cD).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([c,v])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><div style="min-width:82px;font-size:.7rem;color:var(--muted2)">${c}</div><div style="flex:1;background:var(--border);border-radius:2px;height:9px;overflow:hidden"><div style="height:100%;width:${(v/maxC*100).toFixed(1)}%;background:linear-gradient(90deg,var(--ye2),var(--ye));border-radius:2px"></div></div><div style="min-width:82px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:.87rem;color:var(--ye)">${KSH(v)}</div></div>`).join('')||'<div class="empty"><span class="empty-i">🧱</span>No data</div>';
+}
+
+// SETUP
+function renderSetup(){
+  document.getElementById('sBiz').value=sett.biz||'';document.getElementById('sMgr').value=sett.mgr||'';document.getElementById('sPh').value=sett.ph||'';document.getElementById('sLoc').value=sett.loc||'';
+  document.getElementById('sqlOut').textContent=`-- SITEFORGE SQL — Run each block in Supabase SQL Editor
+
+CREATE TABLE IF NOT EXISTS construction_projects (
+  id bigint PRIMARY KEY, name text NOT NULL,
+  client text, location text, type text DEFAULT 'residential',
+  start_date text, end_date text, budget numeric DEFAULT 0,
+  status text DEFAULT 'active', phase text DEFAULT 'foundation',
+  progress int DEFAULT 0, notes text,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS construction_tasks (
+  id bigint PRIMARY KEY, name text NOT NULL,
+  project_id bigint, assigned_to text, phase text,
+  due_date text, priority text DEFAULT 'medium',
+  status text DEFAULT 'pending', cost numeric DEFAULT 0,
+  notes text, created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS construction_workers (
+  id bigint PRIMARY KEY, name text NOT NULL,
+  phone text, role text, project_id bigint,
+  daily_rate numeric DEFAULT 0, days_worked int DEFAULT 0,
+  id_number text, start_date text,
+  status text DEFAULT 'active', notes text,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS construction_materials (
+  id bigint PRIMARY KEY, name text NOT NULL,
+  category text, project_id bigint, date text,
+  qty numeric DEFAULT 0, unit text,
+  unit_cost numeric DEFAULT 0, total_cost numeric DEFAULT 0,
+  supplier text, created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS construction_issues (
+  id bigint PRIMARY KEY, title text NOT NULL,
+  project_id bigint, reporter text,
+  severity text DEFAULT 'medium', status text DEFAULT 'open',
+  impact numeric DEFAULT 0, assigned_to text,
+  description text, date text,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS construction_photos (
+  id bigint PRIMARY KEY, project_id bigint,
+  date text, phase text, progress_pct int,
+  notes text, image_url text,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER PUBLICATION supabase_realtime ADD TABLE
+  construction_projects, construction_tasks,
+  construction_workers, construction_materials,
+  construction_issues, construction_photos;`;
+}
+function saveSett(){sett.biz=document.getElementById('sBiz').value||'SiteForge';sett.mgr=document.getElementById('sMgr').value;sett.ph=document.getElementById('sPh').value;sett.loc=document.getElementById('sLoc').value;localStorage.setItem('sf_sett',JSON.stringify(sett));document.getElementById('bizTitle').textContent=sett.biz.toUpperCase();toast('SAVED','gr');}
+function cpSql(){navigator.clipboard.writeText(document.getElementById('sqlOut').textContent).then(()=>toast('SQL COPIED','gr')).catch(()=>toast('SELECT MANUALLY','rd'));}
+
+// SAVES
+async function saveProj(){
+  const name=document.getElementById('pjN').value.trim();if(!name){toast('Enter project name','rd');return;}
+  const rec={id:Date.now(),name,client:document.getElementById('pjCl').value,location:document.getElementById('pjLoc').value,type:document.getElementById('pjTyp').value,start_date:document.getElementById('pjSD').value,end_date:document.getElementById('pjED').value,budget:parseFloat(document.getElementById('pjBgt').value)||0,status:document.getElementById('pjSt').value,phase:curPhase,progress:parseInt(document.getElementById('pjProg').value)||0,notes:document.getElementById('pjNo').value,created_at:new Date().toISOString()};
+  try{const{data,error}=await sb.from('construction_projects').insert(rec).select().single();if(error)throw error;projects=[data,...projects];online();}catch(e){projects=[rec,...projects];offline();}
+  cm('mAddProj');['pjN','pjCl','pjLoc','pjBgt','pjNo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderProjects();fillSels();updateRibbon();toast(`🏗 ${name} CREATED!`,'gr');
+}
+async function saveTask(){
+  const name=document.getElementById('tkN').value.trim();const pid=document.getElementById('tkP').value;if(!name||!pid){toast('Fill name and project','rd');return;}
+  const rec={id:Date.now(),name,project_id:parseInt(pid),assigned_to:document.getElementById('tkAss').value,phase:document.getElementById('tkPh').value,due_date:document.getElementById('tkDue').value,priority:document.getElementById('tkPri').value,status:document.getElementById('tkSt').value,cost:parseFloat(document.getElementById('tkCost').value)||0,notes:document.getElementById('tkNo').value,created_at:new Date().toISOString()};
+  try{const{data,error}=await sb.from('construction_tasks').insert(rec).select().single();if(error)throw error;tasks=[data,...tasks];online();}catch(e){tasks=[rec,...tasks];offline();}
+  cm('mAddTask');['tkN','tkAss','tkDue','tkCost','tkNo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});loadTasks();toast('📋 TASK ADDED','gr');
+}
+async function saveWorker(){
+  const name=document.getElementById('wkN').value.trim();if(!name){toast('Enter name','rd');return;}
+  const rec={id:Date.now(),name,phone:document.getElementById('wkPh').value,role:document.getElementById('wkRole').value,project_id:parseInt(document.getElementById('wkP').value)||null,daily_rate:parseFloat(document.getElementById('wkRate').value)||0,days_worked:parseInt(document.getElementById('wkDays').value)||0,id_number:document.getElementById('wkID').value,start_date:document.getElementById('wkSD').value,status:'active',created_at:new Date().toISOString()};
+  try{const{data,error}=await sb.from('construction_workers').insert(rec).select().single();if(error)throw error;workers=[data,...workers];online();}catch(e){workers=[rec,...workers];offline();}
+  cm('mAddWorker');renderWorkers();toast('👷 ADDED','gr');
+}
+async function saveMat(){
+  const name=document.getElementById('mtN').value.trim();const pid=document.getElementById('mtP').value;if(!name||!pid){toast('Fill name and project','rd');return;}
+  const qty=parseFloat(document.getElementById('mtQty').value)||0;const uc=parseFloat(document.getElementById('mtUC').value)||0;
+  const rec={id:Date.now(),name,category:document.getElementById('mtCat').value,project_id:parseInt(pid),date:document.getElementById('mtDt').value||today(),qty,unit:document.getElementById('mtUnit').value,unit_cost:uc,total_cost:qty*uc,supplier:document.getElementById('mtSup').value,created_at:new Date().toISOString()};
+  try{const{data,error}=await sb.from('construction_materials').insert(rec).select().single();if(error)throw error;materials=[data,...materials];online();}catch(e){materials=[rec,...materials];offline();}
+  cm('mAddMat');['mtN','mtQty','mtUC','mtTC','mtSup'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});loadMaterials();toast('🧱 LOGGED','gr');
+}
+async function saveIssue(){
+  const title=document.getElementById('isN').value.trim();if(!title){toast('Enter issue title','rd');return;}
+  const rec={id:Date.now(),title,project_id:parseInt(document.getElementById('isP').value)||null,reporter:document.getElementById('isRep').value,severity:document.getElementById('isSev').value,status:'open',impact:parseFloat(document.getElementById('isImp').value)||0,assigned_to:document.getElementById('isAss').value,description:document.getElementById('isDes').value,date:today(),created_at:new Date().toISOString()};
+  try{const{data,error}=await sb.from('construction_issues').insert(rec).select().single();if(error)throw error;issues=[data,...issues];online();}catch(e){issues=[rec,...issues];offline();}
+  cm('mAddIssue');loadIssues();renderDash();toast('⚠ ISSUE LOGGED','gr');
+}
+async function savePhoto(){
+  const notes=document.getElementById('phNote').value.trim();if(!notes){toast('Add notes','rd');return;}
+  const rec={id:Date.now(),project_id:parseInt(document.getElementById('phP').value)||null,date:document.getElementById('phDt').value||today(),phase:document.getElementById('phPh').value,progress_pct:parseInt(document.getElementById('phProg').value)||0,notes,image_url:document.getElementById('phImg').value,created_at:new Date().toISOString()};
+  try{const{data,error}=await sb.from('construction_photos').insert(rec).select().single();if(error)throw error;photos=[data,...photos];online();}catch(e){photos=[rec,...photos];offline();}
+  cm('mAddPhoto');loadPhotos();toast('📷 UPDATE SAVED','gr');
+}
+
+// INIT
+async function init(){
+  try{const s=localStorage.getItem('sf_sett');if(s)Object.assign(sett,JSON.parse(s));}catch(e){}
+  document.getElementById('bizTitle').textContent=(sett.biz||'SITEFORGE').toUpperCase();
+  const md=document.getElementById('mtDt');if(md)md.value=today();
+  const pd=document.getElementById('phDt');if(pd)pd.value=today();
+  try{
+    const[p,t,w,m,i,ph]=await Promise.all([
+      sb.from('construction_projects').select('*').order('id',{ascending:false}),
+      sb.from('construction_tasks').select('*').order('id',{ascending:false}),
+      sb.from('construction_workers').select('*').order('id',{ascending:false}),
+      sb.from('construction_materials').select('*').order('id',{ascending:false}),
+      sb.from('construction_issues').select('*').order('id',{ascending:false}),
+      sb.from('construction_photos').select('*').order('id',{ascending:false}),
+    ]);
+    projects=p.data||[];tasks=t.data||[];workers=w.data||[];materials=m.data||[];issues=i.data||[];photos=ph.data||[];
+    online();
+  }catch(e){offline();}
+  fillSels();renderDash();renderSetup();
+}
+init();
+</script>
+</body>
+</html>
