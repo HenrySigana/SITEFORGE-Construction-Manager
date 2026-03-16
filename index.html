@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,6 +23,135 @@ body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-ser
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
+/* ===================== LOGIN OVERLAY ===================== */
+#loginOverlay{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;overflow:hidden;
+}
+#loginOverlay::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 55% 45% at 20% 20%, rgba(232,101,10,.1) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 55% at 80% 80%, rgba(245,184,0,.06) 0%, transparent 55%);
+  pointer-events:none;
+}
+#loginOverlay::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(232,101,10,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,101,10,.04) 1px, transparent 1px);
+  background-size:48px 48px;
+  animation:gridMove 28s linear infinite;
+  pointer-events:none;
+}
+@keyframes gridMove{from{background-position:0 0}to{background-position:48px 48px}}
+
+.login-box{
+  position:relative;z-index:1;
+  width:100%;max-width:370px;
+  background:var(--s1);
+  border:1px solid var(--border2);
+  border-top:3px solid var(--or);
+  border-radius:var(--r2);
+  padding:32px 28px 28px;
+  box-shadow:0 28px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.03);
+  animation:loginIn .5s cubic-bezier(.175,.885,.32,1.275) both;
+}
+@keyframes loginIn{from{opacity:0;transform:translateY(28px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.login-logo{text-align:center;margin-bottom:26px;}
+.login-mark{
+  width:64px;height:64px;
+  background:var(--or);
+  clip-path:polygon(0 0,100% 0,100% 75%,75% 100%,0 100%);
+  display:inline-grid;place-items:center;
+  font-size:1.8rem;margin-bottom:12px;
+  box-shadow:0 8px 28px rgba(232,101,10,.4);
+}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;color:#fff;margin-bottom:3px;}
+.login-sub{font-size:.58rem;color:var(--or);letter-spacing:3px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;}
+
+.pin-label{
+  font-size:.58rem;color:var(--muted2);letter-spacing:2px;
+  text-transform:uppercase;font-family:'IBM Plex Mono',monospace;
+  text-align:center;margin-bottom:14px;
+}
+
+.pin-dots{display:flex;gap:14px;justify-content:center;margin-bottom:26px;}
+.pin-dot{
+  width:15px;height:15px;border-radius:50%;
+  border:2px solid var(--border2);background:transparent;
+  transition:all .2s cubic-bezier(.175,.885,.32,1.275);
+}
+.pin-dot.filled{
+  background:var(--or);border-color:var(--or);
+  box-shadow:0 0 14px rgba(232,101,10,.6);
+  transform:scale(1.2);
+}
+.pin-dot.error{background:var(--red);border-color:var(--red);box-shadow:0 0 14px rgba(224,60,60,.6);}
+
+.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+.pin-key{
+  aspect-ratio:1;
+  border:1px solid var(--border2);
+  background:var(--card2);
+  border-radius:var(--r);
+  color:var(--text);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.5rem;letter-spacing:1px;
+  cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.pin-key:hover{background:rgba(232,101,10,.12);border-color:var(--or2);color:var(--or3);}
+.pin-key:active{transform:scale(.92);background:rgba(232,101,10,.2);}
+.pin-key .sub{font-size:.42rem;letter-spacing:1.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-weight:500;}
+.pin-key.zero{grid-column:2;}
+.pin-key.del{background:transparent;border-color:rgba(224,60,60,.2);color:var(--red);}
+.pin-key.del:hover{background:rgba(224,60,60,.1);border-color:var(--red);}
+
+.login-error{
+  text-align:center;margin-top:14px;
+  font-size:.75rem;color:var(--red);font-weight:600;
+  font-family:'IBM Plex Mono',monospace;letter-spacing:.5px;
+  min-height:18px;opacity:0;transition:opacity .2s;
+}
+.login-error.show{opacity:1;}
+
+.login-box.shake{animation:boxShake .4s cubic-bezier(.36,.07,.19,.97);}
+@keyframes boxShake{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+
+.attempt-bar{display:flex;gap:5px;justify-content:center;margin-top:13px;}
+.attempt-pip{width:9px;height:3px;border-radius:2px;background:var(--border2);transition:background .3s;}
+.attempt-pip.fail{background:var(--red);}
+
+#lockoutBox{
+  display:none;text-align:center;margin-top:18px;
+  background:rgba(224,60,60,.08);border:1px solid rgba(224,60,60,.25);
+  border-radius:var(--r);padding:12px 16px;
+}
+#lockoutBox .lock-icon{font-size:1.8rem;margin-bottom:5px;}
+#lockoutBox p{font-size:.75rem;color:var(--red);font-family:'IBM Plex Mono',monospace;}
+#lockoutBox strong{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--red);letter-spacing:1px;}
+
+/* LOCK button in header */
+#lockBtn{
+  background:rgba(224,60,60,.1);border:1px solid rgba(224,60,60,.25);
+  color:var(--red);padding:4px 10px;border-radius:var(--r);
+  font-family:'IBM Plex Mono',monospace;font-size:.62rem;font-weight:600;
+  cursor:pointer;letter-spacing:.5px;transition:all .2s;display:none;
+  white-space:nowrap;
+}
+#lockBtn:hover{background:rgba(224,60,60,.2);}
+
+/* ===================== APP ROOT ===================== */
+#appRoot{display:none;}
+
+/* ===================== ORIGINAL STYLES ===================== */
 header{background:linear-gradient(180deg,#080705,var(--s1));border-bottom:2px solid var(--or2);padding:0 20px;display:flex;align-items:stretch;position:sticky;top:0;z-index:100;min-height:54px;}
 .hlogo{display:flex;align-items:center;gap:12px;padding:10px 18px 10px 0;border-right:1px solid var(--border2);margin-right:14px;}
 .hlogo-mark{width:38px;height:38px;background:var(--or);clip-path:polygon(0 0,100% 0,100% 75%,75% 100%,0 100%);display:grid;place-items:center;font-size:1.1rem;flex-shrink:0;}
@@ -174,6 +302,57 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
 </head>
 <body>
 
+<!-- ===================== LOGIN OVERLAY ===================== -->
+<div id="loginOverlay">
+  <div class="login-box" id="loginBox">
+    <div class="login-logo">
+      <div class="login-mark">🏗</div>
+      <div class="login-title">SITEFORGE</div>
+      <div class="login-sub">Construction Manager</div>
+    </div>
+
+    <div class="pin-label">Enter PIN to access</div>
+
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot" id="dot0"></div>
+      <div class="pin-dot" id="dot1"></div>
+      <div class="pin-dot" id="dot2"></div>
+      <div class="pin-dot" id="dot3"></div>
+    </div>
+
+    <div class="pin-keypad" id="pinKeypad">
+      <button class="pin-key" onclick="pinPress('1')">1<span class="sub"></span></button>
+      <button class="pin-key" onclick="pinPress('2')">2<span class="sub">ABC</span></button>
+      <button class="pin-key" onclick="pinPress('3')">3<span class="sub">DEF</span></button>
+      <button class="pin-key" onclick="pinPress('4')">4<span class="sub">GHI</span></button>
+      <button class="pin-key" onclick="pinPress('5')">5<span class="sub">JKL</span></button>
+      <button class="pin-key" onclick="pinPress('6')">6<span class="sub">MNO</span></button>
+      <button class="pin-key" onclick="pinPress('7')">7<span class="sub">PQRS</span></button>
+      <button class="pin-key" onclick="pinPress('8')">8<span class="sub">TUV</span></button>
+      <button class="pin-key" onclick="pinPress('9')">9<span class="sub">WXYZ</span></button>
+      <button class="pin-key zero" onclick="pinPress('0')">0</button>
+      <button class="pin-key del" onclick="pinDelete()">⌫</button>
+    </div>
+
+    <div class="login-error" id="loginError"></div>
+
+    <div class="attempt-bar">
+      <div class="attempt-pip" id="pip0"></div>
+      <div class="attempt-pip" id="pip1"></div>
+      <div class="attempt-pip" id="pip2"></div>
+    </div>
+
+    <div id="lockoutBox">
+      <div class="lock-icon">🔒</div>
+      <p>Too many failed attempts.</p>
+      <p>Try again in <strong id="lockCountdown">60</strong>s</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APP ROOT ===================== -->
+<div id="appRoot">
+
 <header>
   <div class="hlogo">
     <div class="hlogo-mark">🏗</div>
@@ -186,6 +365,7 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
     <div class="ldot" id="ldot"></div>
     <div class="ltxt" id="lstatus">connecting</div>
     <div class="htime"><span class="hdate" id="hDate"></span><span class="hclock" id="hClock"></span></div>
+    <button id="lockBtn" onclick="doLogout()" title="Lock app">🔒 LOCK</button>
   </div>
 </header>
 
@@ -317,7 +497,7 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
   <div class="sg" id="matSg"></div>
   <div class="tw">
     <table>
-      <thead><tr><th>Date</th><th>Material</th><th>Category</th><th>Project</th><th>Qty</th><th>Unit</th><th>Unit Cost</th><th>Total</th><th>Supplier</th><th></th></tr></thead>
+      <thead><tr><th>Date</th><th>Material</th><th>Category</th><th>Project</th><th>Qty</th><th>Unit</th><th>Rate (KSh/unit)</th><th>Total (KSh)</th><th>Supplier</th><th></th></tr></thead>
       <tbody id="matTb"></tbody>
     </table>
   </div>
@@ -386,13 +566,29 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
 <div class="tab" id="tab-setup">
   <div class="sec">⚙ Setup</div>
   <div class="g2">
-    <div class="card">
-      <div class="card-title">🏢 Company Info</div>
-      <div class="fg" style="margin-bottom:9px"><label>Company Name</label><input id="sBiz" placeholder="e.g. Kamau Builders Ltd"></div>
-      <div class="fg" style="margin-bottom:9px"><label>Site Manager</label><input id="sMgr" placeholder="Manager name"></div>
-      <div class="fg" style="margin-bottom:9px"><label>Phone</label><input id="sPh" placeholder="07XX XXX XXX"></div>
-      <div class="fg" style="margin-bottom:13px"><label>Location</label><input id="sLoc" placeholder="Nairobi, Kenya"></div>
-      <button class="btn btn-or" onclick="saveSett()">💾 Save</button>
+    <div>
+      <div class="card" style="margin-bottom:13px">
+        <div class="card-title">🏢 Company Info</div>
+        <div class="fg" style="margin-bottom:9px"><label>Company Name</label><input id="sBiz" placeholder="e.g. Kamau Builders Ltd"></div>
+        <div class="fg" style="margin-bottom:9px"><label>Site Manager</label><input id="sMgr" placeholder="Manager name"></div>
+        <div class="fg" style="margin-bottom:9px"><label>Phone</label><input id="sPh" placeholder="07XX XXX XXX"></div>
+        <div class="fg" style="margin-bottom:13px"><label>Location</label><input id="sLoc" placeholder="Nairobi, Kenya"></div>
+        <button class="btn btn-or" onclick="saveSett()">💾 Save</button>
+      </div>
+      <div class="card">
+        <div class="card-title">🔐 Security</div>
+        <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Your app is protected with a 4-digit PIN set in the source code.</p>
+        <div style="background:rgba(232,101,10,.06);border:1px solid rgba(232,101,10,.2);border-radius:var(--r);padding:11px 13px;font-size:.75rem;color:var(--muted);line-height:1.8">
+          <div style="color:var(--or3);font-weight:600;margin-bottom:4px;font-family:'IBM Plex Mono',monospace;">🔒 LOGIN FEATURES</div>
+          <div>✅ PIN-protected on every page load</div>
+          <div>✅ Auto-lock after 3 failed attempts (60s)</div>
+          <div>✅ Manual lock via 🔒 LOCK button in header</div>
+          <div>✅ Session clears on browser close</div>
+        </div>
+        <div style="margin-top:11px">
+          <button class="btn btn-ghost btn-sm" onclick="doLogout()">🔒 Lock App Now</button>
+        </div>
+      </div>
     </div>
     <div class="card">
       <div class="card-title">🗄️ SQL — Run in Supabase</div>
@@ -405,7 +601,6 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
 </main>
 
 <!-- MODALS -->
-
 <div class="mbd" id="mAddProj">
   <div class="modal">
     <div class="mtitle">🏗 NEW PROJECT</div>
@@ -531,8 +726,8 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
       </div>
     </div>
     <div class="frow">
-      <div class="fg"><label>Unit Cost (KSh)</label><input type="number" id="mtUC" placeholder="0" oninput="calcMat()"></div>
-      <div class="fg"><label>Total (auto)</label><input type="number" id="mtTC" readonly style="color:var(--or3)"></div>
+      <div class="fg"><label>Rate (KSh per unit)</label><input type="number" id="mtUC" placeholder="e.g. 750" oninput="calcMat()"></div>
+      <div class="fg"><label>Total Cost (auto-calc)</label><input type="number" id="mtTC" readonly style="color:var(--or3)" placeholder="Qty × Rate"></div>
     </div>
     <div class="fg" style="margin-bottom:10px"><label>Supplier</label><input id="mtSup" placeholder="Supplier name or shop"></div>
     <div class="mactions">
@@ -591,7 +786,135 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
 
 <div id="toast"></div>
 
+</div><!-- end #appRoot -->
+
 <script>
+// ===================== PIN AUTH =====================
+const CORRECT_PIN = '7526';
+const MAX_ATTEMPTS = 3;
+const LOCKOUT_SECONDS = 60;
+
+let pinBuffer = '';
+let failedAttempts = 0;
+let isLockedOut = false;
+let lockoutTimer = null;
+
+function pinPress(digit) {
+  if (isLockedOut) return;
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updateDots();
+  if (pinBuffer.length === 4) setTimeout(checkPin, 120);
+}
+
+function pinDelete() {
+  if (isLockedOut) return;
+  pinBuffer = pinBuffer.slice(0, -1);
+  updateDots();
+}
+
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('dot' + i);
+    dot.classList.toggle('filled', i < pinBuffer.length);
+    dot.classList.remove('error');
+  }
+}
+
+function checkPin() {
+  if (pinBuffer === CORRECT_PIN) {
+    for (let i = 0; i < 4; i++) document.getElementById('dot' + i).classList.add('filled');
+    failedAttempts = 0;
+    setTimeout(unlockApp, 300);
+  } else {
+    for (let i = 0; i < 4; i++) {
+      document.getElementById('dot' + i).classList.remove('filled');
+      document.getElementById('dot' + i).classList.add('error');
+    }
+    failedAttempts++;
+    document.getElementById('pip' + (failedAttempts - 1)).classList.add('fail');
+    const box = document.getElementById('loginBox');
+    box.classList.add('shake');
+    setTimeout(() => box.classList.remove('shake'), 400);
+    const errEl = document.getElementById('loginError');
+    const remaining = MAX_ATTEMPTS - failedAttempts;
+    errEl.textContent = remaining > 0
+      ? `WRONG PIN — ${remaining} ATTEMPT${remaining > 1 ? 'S' : ''} LEFT`
+      : 'ACCESS DENIED — WAIT';
+    errEl.classList.add('show');
+    setTimeout(() => {
+      for (let i = 0; i < 4; i++) document.getElementById('dot' + i).classList.remove('error');
+      pinBuffer = '';
+      if (failedAttempts >= MAX_ATTEMPTS) startLockout();
+    }, 600);
+  }
+}
+
+function startLockout() {
+  isLockedOut = true;
+  document.getElementById('pinKeypad').style.opacity = '0.3';
+  document.getElementById('pinKeypad').style.pointerEvents = 'none';
+  document.getElementById('lockoutBox').style.display = 'block';
+  document.getElementById('loginError').classList.remove('show');
+  let seconds = LOCKOUT_SECONDS;
+  document.getElementById('lockCountdown').textContent = seconds;
+  lockoutTimer = setInterval(() => {
+    seconds--;
+    document.getElementById('lockCountdown').textContent = seconds;
+    if (seconds <= 0) {
+      clearInterval(lockoutTimer);
+      isLockedOut = false; failedAttempts = 0; pinBuffer = '';
+      document.getElementById('pinKeypad').style.opacity = '1';
+      document.getElementById('pinKeypad').style.pointerEvents = '';
+      document.getElementById('lockoutBox').style.display = 'none';
+      updateDots();
+      for (let i = 0; i < 3; i++) document.getElementById('pip' + i).className = 'attempt-pip';
+    }
+  }, 1000);
+}
+
+function unlockApp() {
+  sessionStorage.setItem('siteforge_unlocked', '1');
+  const overlay = document.getElementById('loginOverlay');
+  overlay.style.transition = 'opacity .4s ease, transform .4s ease';
+  overlay.style.opacity = '0';
+  overlay.style.transform = 'scale(1.04)';
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    document.getElementById('appRoot').style.display = 'block';
+    document.getElementById('lockBtn').style.display = 'inline-flex';
+    init();
+  }, 400);
+}
+
+function doLogout() {
+  sessionStorage.removeItem('siteforge_unlocked');
+  pinBuffer = ''; failedAttempts = 0; isLockedOut = false;
+  for (let i = 0; i < 4; i++) { const d = document.getElementById('dot' + i); d.classList.remove('filled', 'error'); }
+  for (let i = 0; i < 3; i++) document.getElementById('pip' + i).className = 'attempt-pip';
+  document.getElementById('loginError').classList.remove('show');
+  document.getElementById('appRoot').style.display = 'none';
+  document.getElementById('lockBtn').style.display = 'none';
+  const overlay = document.getElementById('loginOverlay');
+  overlay.style.display = 'flex';
+  overlay.style.opacity = '1';
+  overlay.style.transform = 'scale(1)';
+  updateDots();
+}
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('loginOverlay').style.display === 'none') return;
+  if (e.key >= '0' && e.key <= '9') pinPress(e.key);
+  if (e.key === 'Backspace' || e.key === 'Delete') pinDelete();
+});
+
+if (sessionStorage.getItem('siteforge_unlocked') === '1') {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('appRoot').style.display = 'block';
+  document.getElementById('lockBtn').style.display = 'inline-flex';
+}
+
+// ===================== APP CODE =====================
 const SB_URL='https://skdurrpixoonhuarozwv.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrZHVycnBpeG9vbmh1YXJvend2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjk2MTYsImV4cCI6MjA4ODgwNTYxNn0.xVIbJ0nda02SjYpedpVmIKzAPMcrvEkTRAfG_XUsaGI';
 const sb=supabase.createClient(SB_URL,SB_KEY);
@@ -647,7 +970,6 @@ function updateRibbon(){
   document.getElementById('projPills').innerHTML=projects.slice(0,5).map(p=>`<div class="ppill"><div class="ppill-name">${p.name.slice(0,22)}</div><div class="ppill-prog">${p.progress||0}% · ${p.phase||'planning'}</div></div>`).join('')||'<div style="font-size:.68rem;color:var(--muted);padding:4px 0">No projects yet</div>';
 }
 
-// DASHBOARD
 function renderDash(){
   updateRibbon();
   const active=projects.filter(p=>p.status==='active').length;
@@ -665,7 +987,6 @@ function renderDash(){
     {l:'Avg Progress',v:avgProg+'%',s:'All projects',c:'or',cls:'or'},
     {l:'Total Spend',v:KSH(totalS),s:'Budget: '+KSH(totalB),c:'ye',cls:'ye'},
   ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
-
   const al=[];
   const delayed=projects.filter(p=>p.end_date&&new Date(p.end_date)<new Date()&&p.status==='active');
   if(delayed.length)al.push(`🚨 ${delayed.length} project${delayed.length>1?'s':''} past deadline`);
@@ -674,7 +995,6 @@ function renderDash(){
   const overDue=tasks.filter(t=>t.due_date&&new Date(t.due_date)<new Date()&&t.status!=='done');
   if(overDue.length)al.push(`📋 ${overDue.length} task${overDue.length>1?'s':''} overdue`);
   document.getElementById('dashAlerts').innerHTML=al.map(m=>`<div style="background:rgba(224,60,60,.08);border:1px solid rgba(224,60,60,.25);color:var(--red);border-radius:7px;padding:8px 12px;font-size:.79rem;font-weight:600;margin-bottom:7px">${m}</div>`).join('');
-
   document.getElementById('dashProjects').innerHTML=projects.filter(p=>p.status==='active').slice(0,4).map(p=>`
     <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;margin-bottom:7px">
       <div style="display:flex;justify-content:space-between;margin-bottom:4px">
@@ -684,33 +1004,20 @@ function renderDash(){
       <div class="pbar"><div class="pbar-fill" style="width:${p.progress||0}%"></div></div>
       <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:.6rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace"><span>${p.start_date||'—'} → ${p.end_date||'—'}</span><span>${KSH(p.budget)}</span></div>
     </div>`).join('')||'<div class="empty"><span class="empty-i">🏗</span>No active projects</div>';
-
   const urg=tasks.filter(t=>t.status!=='done'&&(t.priority==='urgent'||t.priority==='high')).slice(0,4);
   document.getElementById('dashTasks').innerHTML=urg.length?urg.map(t=>`
     <div class="task-card p-${t.priority}">
       <div class="tcheck ${t.status==='done'?'done':''}" onclick="toggleTask(${t.id})">${t.status==='done'?'✓':''}</div>
-      <div class="tinfo">
-        <div class="tname ${t.status==='done'?'done':''}">${t.name}</div>
-        <div class="tsub">${pname(t.project_id)} · ${t.phase||'—'} · ${t.assigned_to||'Unassigned'}</div>
-      </div>
-      <div class="tright">
-        <div class="tdue ${t.due_date&&new Date(t.due_date)<new Date()?'late':''}">${t.due_date||'—'}</div>
-        <span class="badge b-${t.priority==='urgent'?'rd':'or'}">${t.priority}</span>
-      </div>
+      <div class="tinfo"><div class="tname ${t.status==='done'?'done':''}">${t.name}</div><div class="tsub">${pname(t.project_id)} · ${t.phase||'—'} · ${t.assigned_to||'Unassigned'}</div></div>
+      <div class="tright"><div class="tdue ${t.due_date&&new Date(t.due_date)<new Date()?'late':''}">${t.due_date||'—'}</div><span class="badge b-${t.priority==='urgent'?'rd':'or'}">${t.priority}</span></div>
     </div>`).join(''):'<div class="empty" style="padding:13px"><span class="empty-i">📋</span>No urgent tasks</div>';
-
   document.getElementById('dashIssues').innerHTML=issues.filter(i=>i.status!=='resolved').slice(0,4).map(i=>`
     <div class="issue-row">
       <div class="issue-title">${i.title}</div>
-      <div class="issue-meta">
-        <span>${pname(i.project_id)}</span>
-        <span class="badge b-${i.severity==='critical'?'rd':i.severity==='high'?'or':'ye'}">${i.severity}</span>
-        <span>${i.date||'—'}</span>
-      </div>
+      <div class="issue-meta"><span>${pname(i.project_id)}</span><span class="badge b-${i.severity==='critical'?'rd':i.severity==='high'?'or':'ye'}">${i.severity}</span><span>${i.date||'—'}</span></div>
     </div>`).join('')||'<div class="empty" style="padding:13px"><span class="empty-i">⚠</span>No open issues</div>';
 }
 
-// PROJECTS
 function renderProjects(){
   const q=(document.getElementById('projSrch')?.value||'').toLowerCase();
   const fs=document.getElementById('projFSt')?.value||'';
@@ -719,18 +1026,14 @@ function renderProjects(){
   if(fs)list=list.filter(p=>p.status===fs);
   document.getElementById('projGrid').innerHTML=list.length?list.map(p=>{
     const col=PC[p.phase]||'#e8650a';
-    const pT=tasks.filter(t=>t.project_id===p.id);
-    const dT=pT.filter(t=>t.status==='done').length;
+    const pT=tasks.filter(t=>t.project_id===p.id);const dT=pT.filter(t=>t.status==='done').length;
     const pW=workers.filter(w=>w.project_id===p.id).length;
     const pS=materials.filter(m=>m.project_id===p.id).reduce((s,m)=>s+(m.total_cost||0),0)+workers.filter(w=>w.project_id===p.id).reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
     const bP=p.budget?Math.min(100,Math.round(pS/p.budget*100)):0;
     return`<div class="pcard">
       <div class="pcard-top">
         <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div>
-            <div class="pcard-name">${p.name}</div>
-            <div class="pcard-loc">📍 ${p.location||'—'} · ${p.type||'residential'} · Client: ${p.client||'—'}</div>
-          </div>
+          <div><div class="pcard-name">${p.name}</div><div class="pcard-loc">📍 ${p.location||'—'} · ${p.type||'residential'} · Client: ${p.client||'—'}</div></div>
           <span class="badge ${p.status==='active'?'b-gr':p.status==='completed'?'b-sky':p.status==='on_hold'?'b-ye':'b-st'}">${p.status}</span>
         </div>
         <div style="margin-top:9px;display:flex;align-items:flex-end;gap:5px">
@@ -758,279 +1061,94 @@ function renderProjects(){
   }).join(''):`<div style="grid-column:1/-1"><div class="empty"><span class="empty-i">🏗</span>No projects found</div></div>`;
 }
 
-async function updProg(id){
-  const p=projects.find(x=>x.id===id);if(!p)return;
-  const v=prompt(`Progress for "${p.name}" (current: ${p.progress||0}%)\nEnter 0-100:`);
-  if(v===null)return;const pct=Math.max(0,Math.min(100,parseInt(v)||0));
-  try{await sb.from('construction_projects').update({progress:pct}).eq('id',id);}catch(e){}
-  p.progress=pct;renderProjects();renderDash();toast(`📊 ${p.name} → ${pct}%`,'gr');
-}
-async function updPhase(id){
-  const p=projects.find(x=>x.id===id);if(!p)return;
-  const phases=['foundation','walling','roofing','plumbing','electrical','plastering','finishing','handover'];
-  const v=prompt(`Phase for "${p.name}" (current: ${p.phase||'foundation'})\nOptions: ${phases.join(', ')}`);
-  if(!v||!phases.includes(v.toLowerCase()))return;
-  const ph=v.toLowerCase();
-  try{await sb.from('construction_projects').update({phase:ph}).eq('id',id);}catch(e){}
-  p.phase=ph;renderProjects();toast(`🔄 Phase → ${ph}`,'gr');
-}
-async function delProj(id){
-  if(!confirm('Delete project?'))return;
-  try{await sb.from('construction_projects').delete().eq('id',id);}catch(e){}
-  projects=projects.filter(p=>p.id!==id);renderProjects();updateRibbon();toast('Deleted','rd');
-}
+async function updProg(id){const p=projects.find(x=>x.id===id);if(!p)return;const v=prompt(`Progress for "${p.name}" (current: ${p.progress||0}%)\nEnter 0-100:`);if(v===null)return;const pct=Math.max(0,Math.min(100,parseInt(v)||0));try{await sb.from('construction_projects').update({progress:pct}).eq('id',id);}catch(e){}p.progress=pct;renderProjects();renderDash();toast(`📊 ${p.name} → ${pct}%`,'gr');}
+async function updPhase(id){const p=projects.find(x=>x.id===id);if(!p)return;const phases=['foundation','walling','roofing','plumbing','electrical','plastering','finishing','handover'];const v=prompt(`Phase for "${p.name}" (current: ${p.phase||'foundation'})\nOptions: ${phases.join(', ')}`);if(!v||!phases.includes(v.toLowerCase()))return;const ph=v.toLowerCase();try{await sb.from('construction_projects').update({phase:ph}).eq('id',id);}catch(e){}p.phase=ph;renderProjects();toast(`🔄 Phase → ${ph}`,'gr');}
+async function delProj(id){if(!confirm('Delete project?'))return;try{await sb.from('construction_projects').delete().eq('id',id);}catch(e){}projects=projects.filter(p=>p.id!==id);renderProjects();updateRibbon();toast('Deleted','rd');}
 
-// TASKS
 async function loadTasks(){
   document.getElementById('taskList').innerHTML='<div class="loader"><div class="spin"></div>Loading…</div>';
-  try{
-    let q=sb.from('construction_tasks').select('*').order('id',{ascending:false});
-    const pp=document.getElementById('taskFP')?.value;const ss=document.getElementById('taskFS')?.value;const pr=document.getElementById('taskFPri')?.value;
-    if(pp)q=q.eq('project_id',parseInt(pp));if(ss)q=q.eq('status',ss);if(pr)q=q.eq('priority',pr);
-    const{data,error}=await q;if(error)throw error;tasks=data||[];renderTaskList(data||[]);online();
-  }catch(e){renderTaskList(tasks);offline();}
+  try{let q=sb.from('construction_tasks').select('*').order('id',{ascending:false});const pp=document.getElementById('taskFP')?.value;const ss=document.getElementById('taskFS')?.value;const pr=document.getElementById('taskFPri')?.value;if(pp)q=q.eq('project_id',parseInt(pp));if(ss)q=q.eq('status',ss);if(pr)q=q.eq('priority',pr);const{data,error}=await q;if(error)throw error;tasks=data||[];renderTaskList(data||[]);online();}catch(e){renderTaskList(tasks);offline();}
 }
 function renderTaskList(list){
   document.getElementById('taskList').innerHTML=list.length?list.map(t=>`
     <div class="task-card p-${t.priority}">
       <div class="tcheck ${t.status==='done'?'done':''}" onclick="toggleTask(${t.id})">${t.status==='done'?'✓':''}</div>
-      <div class="tinfo">
-        <div class="tname ${t.status==='done'?'done':''}">${t.name}</div>
-        <div class="tsub">${pname(t.project_id)} · ${t.phase||'—'} · 👷 ${t.assigned_to||'Unassigned'}${t.cost?' · '+KSH(t.cost):''}</div>
-      </div>
+      <div class="tinfo"><div class="tname ${t.status==='done'?'done':''}">${t.name}</div><div class="tsub">${pname(t.project_id)} · ${t.phase||'—'} · 👷 ${t.assigned_to||'Unassigned'}${t.cost?' · '+KSH(t.cost):''}</div></div>
       <div class="tright">
         <div class="tdue ${t.due_date&&new Date(t.due_date)<new Date()&&t.status!=='done'?'late':''}">${t.due_date||'—'}</div>
-        <div style="display:flex;gap:3px;justify-content:flex-end;margin-top:3px">
-          <span class="badge b-${t.priority==='urgent'?'rd':t.priority==='high'?'or':'ye'}">${t.priority}</span>
-          <span class="badge b-${t.status==='done'?'gr':t.status==='in_progress'?'sky':t.status==='blocked'?'rd':'st'}">${t.status}</span>
-        </div>
+        <div style="display:flex;gap:3px;justify-content:flex-end;margin-top:3px"><span class="badge b-${t.priority==='urgent'?'rd':t.priority==='high'?'or':'ye'}">${t.priority}</span><span class="badge b-${t.status==='done'?'gr':t.status==='in_progress'?'sky':t.status==='blocked'?'rd':'st'}">${t.status}</span></div>
         <button class="btn btn-ghost btn-xs" style="margin-top:4px;color:var(--red)" onclick="delTask(${t.id})">🗑</button>
       </div>
     </div>`).join(''):'<div class="empty"><span class="empty-i">📋</span>No tasks found</div>';
 }
-async function toggleTask(id){
-  const t=tasks.find(x=>x.id===id);if(!t)return;const ns=t.status==='done'?'in_progress':'done';
-  try{await sb.from('construction_tasks').update({status:ns}).eq('id',id);}catch(e){}
-  t.status=ns;loadTasks();toast(ns==='done'?'✅ Done!':'↩ Reopened');
-}
-async function delTask(id){
-  if(!confirm('Delete?'))return;try{await sb.from('construction_tasks').delete().eq('id',id);}catch(e){}
-  tasks=tasks.filter(t=>t.id!==id);loadTasks();toast('Deleted','rd');
-}
+async function toggleTask(id){const t=tasks.find(x=>x.id===id);if(!t)return;const ns=t.status==='done'?'in_progress':'done';try{await sb.from('construction_tasks').update({status:ns}).eq('id',id);}catch(e){}t.status=ns;loadTasks();toast(ns==='done'?'✅ Done!':'↩ Reopened');}
+async function delTask(id){if(!confirm('Delete?'))return;try{await sb.from('construction_tasks').delete().eq('id',id);}catch(e){}tasks=tasks.filter(t=>t.id!==id);loadTasks();toast('Deleted','rd');}
 
-// WORKERS
 function renderWorkers(){
-  const q=(document.getElementById('workerSrch')?.value||'').toLowerCase();
-  const pp=document.getElementById('workerFP')?.value||'';
-  let list=workers;
-  if(q)list=list.filter(w=>(w.name||'').toLowerCase().includes(q)||(w.role||'').toLowerCase().includes(q));
-  if(pp)list=list.filter(w=>w.project_id==pp);
+  const q=(document.getElementById('workerSrch')?.value||'').toLowerCase();const pp=document.getElementById('workerFP')?.value||'';
+  let list=workers;if(q)list=list.filter(w=>(w.name||'').toLowerCase().includes(q)||(w.role||'').toLowerCase().includes(q));if(pp)list=list.filter(w=>w.project_id==pp);
   const tp=workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
-  document.getElementById('workerSg').innerHTML=[
-    {l:'Total Workers',v:workers.length,s:'All projects',c:'or',cls:'or'},
-    {l:'Total Payroll',v:KSH(tp),s:'All time',c:'ye',cls:'ye'},
-  ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
-  document.getElementById('workerTb').innerHTML=list.length?list.map(w=>{
-    const earned=(w.daily_rate||0)*(w.days_worked||0);
-    return`<tr>
-      <td><div style="font-weight:600">${w.name}</div><div style="font-size:.65rem;color:var(--muted2)">${w.id_number||'—'}</div></td>
-      <td><span class="badge b-or">${w.role}</span></td>
-      <td style="font-size:.72rem">${w.phone||'—'}</td>
-      <td>${pname(w.project_id)}</td>
-      <td style="font-family:'Bebas Neue',sans-serif;color:var(--ye)">${KSH(w.daily_rate)}</td>
-      <td style="font-family:'Bebas Neue',sans-serif">${w.days_worked||0}</td>
-      <td style="font-family:'Bebas Neue',sans-serif;color:var(--gr)">${KSH(earned)}</td>
-      <td><span class="badge b-gr">${w.status||'active'}</span></td>
-      <td><button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delWorker(${w.id})">🗑</button></td>
-    </tr>`;
-  }).join(''):'<tr><td colspan="9"><div class="empty"><span class="empty-i">👷</span>No workers</div></td></tr>';
+  document.getElementById('workerSg').innerHTML=[{l:'Total Workers',v:workers.length,s:'All projects',c:'or',cls:'or'},{l:'Total Payroll',v:KSH(tp),s:'All time',c:'ye',cls:'ye'}].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
+  document.getElementById('workerTb').innerHTML=list.length?list.map(w=>{const earned=(w.daily_rate||0)*(w.days_worked||0);return`<tr><td><div style="font-weight:600">${w.name}</div><div style="font-size:.65rem;color:var(--muted2)">${w.id_number||'—'}</div></td><td><span class="badge b-or">${w.role}</span></td><td style="font-size:.72rem">${w.phone||'—'}</td><td>${pname(w.project_id)}</td><td style="font-family:'Bebas Neue',sans-serif;color:var(--ye)">${KSH(w.daily_rate)}</td><td style="font-family:'Bebas Neue',sans-serif">${w.days_worked||0}</td><td style="font-family:'Bebas Neue',sans-serif;color:var(--gr)">${KSH(earned)}</td><td><span class="badge b-gr">${w.status||'active'}</span></td><td><button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delWorker(${w.id})">🗑</button></td></tr>`;}).join(''):'<tr><td colspan="9"><div class="empty"><span class="empty-i">👷</span>No workers</div></td></tr>';
 }
-async function delWorker(id){
-  if(!confirm('Remove?'))return;try{await sb.from('construction_workers').delete().eq('id',id);}catch(e){}
-  workers=workers.filter(w=>w.id!==id);renderWorkers();toast('Removed','rd');
-}
+async function delWorker(id){if(!confirm('Remove?'))return;try{await sb.from('construction_workers').delete().eq('id',id);}catch(e){}workers=workers.filter(w=>w.id!==id);renderWorkers();toast('Removed','rd');}
 
-// MATERIALS
 async function loadMaterials(){
   document.getElementById('matTb').innerHTML='<tr><td colspan="10"><div class="loader"><div class="spin"></div></div></td></tr>';
-  try{
-    let q=sb.from('construction_materials').select('*').order('id',{ascending:false});
-    const pp=document.getElementById('matFP')?.value;const cc=document.getElementById('matFC')?.value;
-    if(pp)q=q.eq('project_id',parseInt(pp));if(cc)q=q.eq('category',cc);
-    const{data,error}=await q;if(error)throw error;materials=data||[];renderMatTb(data||[]);renderMatSg();online();
-  }catch(e){renderMatTb(materials);offline();}
+  try{let q=sb.from('construction_materials').select('*').order('id',{ascending:false});const pp=document.getElementById('matFP')?.value;const cc=document.getElementById('matFC')?.value;if(pp)q=q.eq('project_id',parseInt(pp));if(cc)q=q.eq('category',cc);const{data,error}=await q;if(error)throw error;materials=data||[];renderMatTb(data||[]);renderMatSg();online();}catch(e){renderMatTb(materials);offline();}
 }
-function renderMatTb(list){
-  document.getElementById('matTb').innerHTML=list.length?list.map(m=>`<tr>
-    <td style="font-size:.7rem;font-family:'IBM Plex Mono',monospace">${m.date||'—'}</td>
-    <td style="font-weight:600">${m.name}</td>
-    <td><span class="badge b-or">${m.category}</span></td>
-    <td>${pname(m.project_id)}</td>
-    <td style="font-family:'Bebas Neue',sans-serif">${m.qty||0}</td>
-    <td style="color:var(--muted2);font-size:.73rem">${m.unit||'—'}</td>
-    <td style="font-family:'Bebas Neue',sans-serif;color:var(--ye)">${KSH(m.unit_cost)}</td>
-    <td style="font-family:'Bebas Neue',sans-serif;color:var(--gr)">${KSH(m.total_cost)}</td>
-    <td style="color:var(--muted2);font-size:.73rem">${m.supplier||'—'}</td>
-    <td><button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delMat(${m.id})">🗑</button></td>
-  </tr>`).join(''):'<tr><td colspan="10"><div class="empty"><span class="empty-i">🧱</span>No materials</div></td></tr>';
-}
-function renderMatSg(){
-  const total=materials.reduce((s,m)=>s+(m.total_cost||0),0);
-  const cement=materials.filter(m=>m.category==='cement').reduce((s,m)=>s+(m.total_cost||0),0);
-  const steel=materials.filter(m=>m.category==='steel').reduce((s,m)=>s+(m.total_cost||0),0);
-  document.getElementById('matSg').innerHTML=[
-    {l:'Total Materials',v:KSH(total),s:'All purchases',c:'ye',cls:'ye'},
-    {l:'Cement',v:KSH(cement),s:'Cement spend',c:'or',cls:'or'},
-    {l:'Steel',v:KSH(steel),s:'Steel spend',c:'st',cls:'st'},
-  ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
-}
+function renderMatTb(list){document.getElementById('matTb').innerHTML=list.length?list.map(m=>`<tr><td style="font-size:.7rem;font-family:'IBM Plex Mono',monospace">${m.date||'—'}</td><td style="font-weight:600">${m.name}</td><td><span class="badge b-or">${m.category}</span></td><td>${pname(m.project_id)}</td><td style="font-family:'Bebas Neue',sans-serif">${m.qty||0}</td><td style="color:var(--muted2);font-size:.73rem">${m.unit||'—'}</td><td><div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--or3)">${Number(m.unit_cost||0).toLocaleString('en-KE')}</div><div style="font-size:.58rem;color:var(--muted);font-family:'IBM Plex Mono',monospace">per ${m.unit||'unit'}</div></td><td style="font-family:'Bebas Neue',sans-serif;color:var(--gr)">${KSH(m.total_cost)}</td><td style="color:var(--muted2);font-size:.73rem">${m.supplier||'—'}</td><td><button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delMat(${m.id})">🗑</button></td></tr>`).join(''):'<tr><td colspan="10"><div class="empty"><span class="empty-i">🧱</span>No materials</div></td></tr>';}
+function renderMatSg(){const total=materials.reduce((s,m)=>s+(m.total_cost||0),0);const cement=materials.filter(m=>m.category==='cement').reduce((s,m)=>s+(m.total_cost||0),0);const steel=materials.filter(m=>m.category==='steel').reduce((s,m)=>s+(m.total_cost||0),0);document.getElementById('matSg').innerHTML=[{l:'Total Materials',v:KSH(total),s:'All purchases',c:'ye',cls:'ye'},{l:'Cement',v:KSH(cement),s:'Cement spend',c:'or',cls:'or'},{l:'Steel',v:KSH(steel),s:'Steel spend',c:'st',cls:'st'}].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');}
 function calcMat(){const q=parseFloat(document.getElementById('mtQty')?.value)||0;const uc=parseFloat(document.getElementById('mtUC')?.value)||0;const tc=document.getElementById('mtTC');if(tc)tc.value=q*uc;}
-async function delMat(id){
-  if(!confirm('Delete?'))return;try{await sb.from('construction_materials').delete().eq('id',id);}catch(e){}
-  materials=materials.filter(m=>m.id!==id);loadMaterials();toast('Deleted','rd');
-}
+async function delMat(id){if(!confirm('Delete?'))return;try{await sb.from('construction_materials').delete().eq('id',id);}catch(e){}materials=materials.filter(m=>m.id!==id);loadMaterials();toast('Deleted','rd');}
 
-// BUDGET
 function renderBudget(){
-  const tB=projects.reduce((s,p)=>s+(p.budget||0),0);
-  const mC=materials.reduce((s,m)=>s+(m.total_cost||0),0);
-  const lC=workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
-  const tS=mC+lC;const rem=tB-tS;const pct=tB?Math.min(100,Math.round(tS/tB*100)):0;
-  document.getElementById('budgetSg').innerHTML=[
-    {l:'Total Budget',v:KSH(tB),s:'All projects',c:'ye',cls:'ye'},
-    {l:'Total Spent',v:KSH(tS),s:'Mat + Labour',c:'or',cls:'or'},
-    {l:'Remaining',v:KSH(Math.max(0,rem)),s:'Available',c:'gr',cls:'gr'},
-    {l:'% Used',v:pct+'%',s:'Utilization',c:pct>85?'rd':'ye',cls:pct>85?'rd':'ye'},
-    {l:'Materials',v:KSH(mC),s:'Procurement',c:'or',cls:'or'},
-    {l:'Labour',v:KSH(lC),s:'Payroll',c:'st',cls:'st'},
-  ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
-  document.getElementById('budByProj').innerHTML=projects.map(p=>{
-    const sp=materials.filter(m=>m.project_id===p.id).reduce((s,m)=>s+(m.total_cost||0),0)+workers.filter(w=>w.project_id===p.id).reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
-    const pp=p.budget?Math.min(100,Math.round(sp/p.budget*100)):0;
-    return`<div style="margin-bottom:11px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:3px"><div style="font-size:.79rem;font-weight:600">${p.name}</div><div style="font-size:.68rem;font-family:'IBM Plex Mono',monospace;color:var(--muted2)">${KSH(sp)} / ${KSH(p.budget)}</div></div>
-      <div style="height:9px;background:var(--border);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pp}%;background:linear-gradient(90deg,${pp>85?'var(--red)':pp>60?'var(--or2)':'var(--gr2)'},${pp>85?'#ff6b6b':pp>60?'var(--or3)':'var(--gr)'});border-radius:2px;transition:width .7s"></div></div>
-      <div style="font-size:.58rem;color:var(--muted);margin-top:2px;font-family:'IBM Plex Mono',monospace">${pp}% of budget used</div>
-    </div>`;
-  }).join('')||'<div class="empty"><span class="empty-i">💰</span>No projects</div>';
-  const cats=['cement','steel','timber','sand','blocks','roofing','plumbing','electrical','finishing','other'];
-  const cd=cats.map(c=>({c,v:materials.filter(m=>m.category===c).reduce((s,m)=>s+(m.total_cost||0),0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
-  const maxC=Math.max(...cd.map(x=>x.v),1);
-  document.getElementById('budByCat').innerHTML=cd.map(x=>`
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-      <div style="min-width:85px;font-size:.7rem;color:var(--muted2)">${x.c}</div>
-      <div style="flex:1;background:var(--border);border-radius:2px;height:9px;overflow:hidden"><div style="height:100%;width:${(x.v/maxC*100).toFixed(1)}%;background:linear-gradient(90deg,var(--or2),var(--or3));border-radius:2px;transition:width .7s"></div></div>
-      <div style="min-width:82px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:.88rem;color:var(--or3)">${KSH(x.v)}</div>
-    </div>`).join('')||'<div class="empty"><span class="empty-i">🧱</span>No data</div>';
+  const tB=projects.reduce((s,p)=>s+(p.budget||0),0);const mC=materials.reduce((s,m)=>s+(m.total_cost||0),0);const lC=workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);const tS=mC+lC;const rem=tB-tS;const pct=tB?Math.min(100,Math.round(tS/tB*100)):0;
+  document.getElementById('budgetSg').innerHTML=[{l:'Total Budget',v:KSH(tB),s:'All projects',c:'ye',cls:'ye'},{l:'Total Spent',v:KSH(tS),s:'Mat + Labour',c:'or',cls:'or'},{l:'Remaining',v:KSH(Math.max(0,rem)),s:'Available',c:'gr',cls:'gr'},{l:'% Used',v:pct+'%',s:'Utilization',c:pct>85?'rd':'ye',cls:pct>85?'rd':'ye'},{l:'Materials',v:KSH(mC),s:'Procurement',c:'or',cls:'or'},{l:'Labour',v:KSH(lC),s:'Payroll',c:'st',cls:'st'}].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
+  document.getElementById('budByProj').innerHTML=projects.map(p=>{const sp=materials.filter(m=>m.project_id===p.id).reduce((s,m)=>s+(m.total_cost||0),0)+workers.filter(w=>w.project_id===p.id).reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);const pp=p.budget?Math.min(100,Math.round(sp/p.budget*100)):0;return`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><div style="font-size:.79rem;font-weight:600">${p.name}</div><div style="font-size:.68rem;font-family:'IBM Plex Mono',monospace;color:var(--muted2)">${KSH(sp)} / ${KSH(p.budget)}</div></div><div style="height:9px;background:var(--border);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pp}%;background:linear-gradient(90deg,${pp>85?'var(--red)':pp>60?'var(--or2)':'var(--gr2)'},${pp>85?'#ff6b6b':pp>60?'var(--or3)':'var(--gr)'});border-radius:2px;transition:width .7s"></div></div><div style="font-size:.58rem;color:var(--muted);margin-top:2px;font-family:'IBM Plex Mono',monospace">${pp}% of budget used</div></div>`;}).join('')||'<div class="empty"><span class="empty-i">💰</span>No projects</div>';
+  const cats=['cement','steel','timber','sand','blocks','roofing','plumbing','electrical','finishing','other'];const cd=cats.map(c=>({c,v:materials.filter(m=>m.category===c).reduce((s,m)=>s+(m.total_cost||0),0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);const maxC=Math.max(...cd.map(x=>x.v),1);
+  document.getElementById('budByCat').innerHTML=cd.map(x=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="min-width:85px;font-size:.7rem;color:var(--muted2)">${x.c}</div><div style="flex:1;background:var(--border);border-radius:2px;height:9px;overflow:hidden"><div style="height:100%;width:${(x.v/maxC*100).toFixed(1)}%;background:linear-gradient(90deg,var(--or2),var(--or3));border-radius:2px;transition:width .7s"></div></div><div style="min-width:82px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:.88rem;color:var(--or3)">${KSH(x.v)}</div></div>`).join('')||'<div class="empty"><span class="empty-i">🧱</span>No data</div>';
 }
 
-// ISSUES
 async function loadIssues(){
   document.getElementById('issueList').innerHTML='<div class="loader"><div class="spin"></div>Loading…</div>';
-  try{
-    let q=sb.from('construction_issues').select('*').order('id',{ascending:false});
-    const pp=document.getElementById('issFP')?.value;const ss=document.getElementById('issFS')?.value;
-    if(pp)q=q.eq('project_id',parseInt(pp));if(ss)q=q.eq('status',ss);
-    const{data,error}=await q;if(error)throw error;issues=data||[];renderIssueList(data||[]);renderIssSg();online();
-  }catch(e){renderIssueList(issues);offline();}
+  try{let q=sb.from('construction_issues').select('*').order('id',{ascending:false});const pp=document.getElementById('issFP')?.value;const ss=document.getElementById('issFS')?.value;if(pp)q=q.eq('project_id',parseInt(pp));if(ss)q=q.eq('status',ss);const{data,error}=await q;if(error)throw error;issues=data||[];renderIssueList(data||[]);renderIssSg();online();}catch(e){renderIssueList(issues);offline();}
 }
 function renderIssueList(list){
   document.getElementById('issueList').innerHTML=list.length?list.map(i=>`
     <div class="issue-row" style="border-left-color:${i.severity==='critical'?'var(--red)':i.severity==='high'?'var(--or)':i.severity==='medium'?'var(--ye)':'var(--st)'}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div class="issue-title">${i.title}</div>
-        <div style="display:flex;gap:4px;flex-shrink:0;margin-left:9px">
-          <span class="badge b-${i.severity==='critical'?'rd':i.severity==='high'?'or':i.severity==='medium'?'ye':'st'}">${i.severity}</span>
-          <span class="badge b-${i.status==='resolved'?'gr':i.status==='in_progress'?'sky':'rd'}">${i.status}</span>
-        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0;margin-left:9px"><span class="badge b-${i.severity==='critical'?'rd':i.severity==='high'?'or':i.severity==='medium'?'ye':'st'}">${i.severity}</span><span class="badge b-${i.status==='resolved'?'gr':i.status==='in_progress'?'sky':'rd'}">${i.status}</span></div>
       </div>
       ${i.description?`<div style="font-size:.73rem;color:var(--muted2);margin-top:4px">${i.description}</div>`:''}
-      <div class="issue-meta">
-        <span>🏗 ${pname(i.project_id)}</span><span>👤 ${i.reporter||'—'}</span>
-        ${i.assigned_to?`<span>🔧 ${i.assigned_to}</span>`:''}
-        ${i.impact?`<span>💰 ${KSH(i.impact)}</span>`:''}
-        <span>📅 ${i.date||'—'}</span>
-      </div>
-      <div style="margin-top:7px;display:flex;gap:5px">
-        ${i.status!=='resolved'?`<button class="btn btn-gr btn-xs" onclick="resolveIssue(${i.id})">✓ Resolve</button>`:''}
-        <button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delIssue(${i.id})">🗑</button>
-      </div>
+      <div class="issue-meta"><span>🏗 ${pname(i.project_id)}</span><span>👤 ${i.reporter||'—'}</span>${i.assigned_to?`<span>🔧 ${i.assigned_to}</span>`:''}${i.impact?`<span>💰 ${KSH(i.impact)}</span>`:''}<span>📅 ${i.date||'—'}</span></div>
+      <div style="margin-top:7px;display:flex;gap:5px">${i.status!=='resolved'?`<button class="btn btn-gr btn-xs" onclick="resolveIssue(${i.id})">✓ Resolve</button>`:''}<button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delIssue(${i.id})">🗑</button></div>
     </div>`).join(''):'<div class="empty"><span class="empty-i">⚠</span>No issues found</div>';
 }
-function renderIssSg(){
-  const open=issues.filter(i=>i.status==='open').length;const inp=issues.filter(i=>i.status==='in_progress').length;
-  const res=issues.filter(i=>i.status==='resolved').length;const crit=issues.filter(i=>i.severity==='critical'&&i.status!=='resolved').length;
-  document.getElementById('issSg').innerHTML=[
-    {l:'Open',v:open,s:'Awaiting fix',c:'rd',cls:'rd'},{l:'In Progress',v:inp,s:'Being fixed',c:'or',cls:'or'},
-    {l:'Resolved',v:res,s:'Fixed',c:'gr',cls:'gr'},{l:'Critical',v:crit,s:'Urgent',c:'rd',cls:'rd'},
-  ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
-}
-async function resolveIssue(id){
-  try{await sb.from('construction_issues').update({status:'resolved'}).eq('id',id);}catch(e){}
-  const i=issues.find(x=>x.id===id);if(i)i.status='resolved';loadIssues();renderDash();toast('✅ Resolved!','gr');
-}
-async function delIssue(id){
-  if(!confirm('Delete?'))return;try{await sb.from('construction_issues').delete().eq('id',id);}catch(e){}
-  issues=issues.filter(i=>i.id!==id);loadIssues();toast('Deleted','rd');
-}
+function renderIssSg(){const open=issues.filter(i=>i.status==='open').length;const inp=issues.filter(i=>i.status==='in_progress').length;const res=issues.filter(i=>i.status==='resolved').length;const crit=issues.filter(i=>i.severity==='critical'&&i.status!=='resolved').length;document.getElementById('issSg').innerHTML=[{l:'Open',v:open,s:'Awaiting fix',c:'rd',cls:'rd'},{l:'In Progress',v:inp,s:'Being fixed',c:'or',cls:'or'},{l:'Resolved',v:res,s:'Fixed',c:'gr',cls:'gr'},{l:'Critical',v:crit,s:'Urgent',c:'rd',cls:'rd'}].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');}
+async function resolveIssue(id){try{await sb.from('construction_issues').update({status:'resolved'}).eq('id',id);}catch(e){}const i=issues.find(x=>x.id===id);if(i)i.status='resolved';loadIssues();renderDash();toast('✅ Resolved!','gr');}
+async function delIssue(id){if(!confirm('Delete?'))return;try{await sb.from('construction_issues').delete().eq('id',id);}catch(e){}issues=issues.filter(i=>i.id!==id);loadIssues();toast('Deleted','rd');}
 
-// PHOTOS
 async function loadPhotos(){
-  try{
-    let q=sb.from('construction_photos').select('*').order('id',{ascending:false});
-    const pp=document.getElementById('photoFP')?.value;if(pp)q=q.eq('project_id',parseInt(pp));
-    const{data,error}=await q;if(error)throw error;photos=data||[];renderPhotoList(data||[]);online();
-  }catch(e){renderPhotoList(photos);offline();}
+  try{let q=sb.from('construction_photos').select('*').order('id',{ascending:false});const pp=document.getElementById('photoFP')?.value;if(pp)q=q.eq('project_id',parseInt(pp));const{data,error}=await q;if(error)throw error;photos=data||[];renderPhotoList(data||[]);online();}catch(e){renderPhotoList(photos);offline();}
 }
-function renderPhotoList(list){
-  document.getElementById('photoList').innerHTML=list.length?list.map(p=>`
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin-bottom:11px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-        <div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--or3);letter-spacing:1px">${pname(p.project_id)}</div>
-          <div style="font-size:.66rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace">${p.date||'—'} · Phase: ${p.phase||'—'}${p.progress_pct?` · ${p.progress_pct}% done`:''}</div>
-        </div>
-        <button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delPhoto(${p.id})">🗑</button>
-      </div>
-      <div style="font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:7px">${p.notes||'—'}</div>
-      ${p.image_url?`<div style="font-size:.7rem;color:var(--sky);font-family:'IBM Plex Mono',monospace">📷 ${p.image_url}</div>`:''}
-    </div>`).join(''):'<div class="empty"><span class="empty-i">📷</span>No updates yet</div>';
-}
-async function delPhoto(id){
-  if(!confirm('Delete?'))return;try{await sb.from('construction_photos').delete().eq('id',id);}catch(e){}
-  photos=photos.filter(p=>p.id!==id);loadPhotos();toast('Deleted','rd');
-}
+function renderPhotoList(list){document.getElementById('photoList').innerHTML=list.length?list.map(p=>`<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin-bottom:11px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--or3);letter-spacing:1px">${pname(p.project_id)}</div><div style="font-size:.66rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace">${p.date||'—'} · Phase: ${p.phase||'—'}${p.progress_pct?` · ${p.progress_pct}% done`:''}</div></div><button class="btn btn-ghost btn-xs" style="color:var(--red)" onclick="delPhoto(${p.id})">🗑</button></div><div style="font-size:.82rem;color:var(--text);line-height:1.6;margin-bottom:7px">${p.notes||'—'}</div>${p.image_url?`<div style="font-size:.7rem;color:var(--sky);font-family:'IBM Plex Mono',monospace">📷 ${p.image_url}</div>`:''}</div>`).join(''):'<div class="empty"><span class="empty-i">📷</span>No updates yet</div>';}
+async function delPhoto(id){if(!confirm('Delete?'))return;try{await sb.from('construction_photos').delete().eq('id',id);}catch(e){}photos=photos.filter(p=>p.id!==id);loadPhotos();toast('Deleted','rd');}
 
-// REPORTS
 function renderReports(){
-  const tB=projects.reduce((s,p)=>s+(p.budget||0),0);
-  const tS=materials.reduce((s,m)=>s+(m.total_cost||0),0)+workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
-  const avg=projects.length?Math.round(projects.reduce((s,p)=>s+(p.progress||0),0)/projects.length):0;
-  document.getElementById('repSg').innerHTML=[
-    {l:'Projects',v:projects.length,s:'Total',c:'or',cls:'or'},
-    {l:'Avg Progress',v:avg+'%',s:'All projects',c:'ye',cls:'ye'},
-    {l:'Total Budget',v:KSH(tB),s:'All projects',c:'ye',cls:'ye'},
-    {l:'Total Spent',v:KSH(tS),s:'Actual',c:'or',cls:'or'},
-  ].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
-  document.getElementById('repProg').innerHTML=projects.map(p=>`
-    <div style="margin-bottom:11px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:3px"><div style="font-size:.79rem;font-weight:600">${p.name}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:.93rem;color:var(--or3)">${p.progress||0}%</div></div>
-      <div class="pbar"><div class="pbar-fill" style="width:${p.progress||0}%"></div></div>
-      <div style="font-size:.58rem;color:var(--muted);margin-top:2px">${p.phase||'—'} · ${p.status}</div>
-    </div>`).join('')||'<div class="empty"><span class="empty-i">🏗</span>No projects</div>';
+  const tB=projects.reduce((s,p)=>s+(p.budget||0),0);const tS=materials.reduce((s,m)=>s+(m.total_cost||0),0)+workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);const avg=projects.length?Math.round(projects.reduce((s,p)=>s+(p.progress||0),0)/projects.length):0;
+  document.getElementById('repSg').innerHTML=[{l:'Projects',v:projects.length,s:'Total',c:'or',cls:'or'},{l:'Avg Progress',v:avg+'%',s:'All projects',c:'ye',cls:'ye'},{l:'Total Budget',v:KSH(tB),s:'All projects',c:'ye',cls:'ye'},{l:'Total Spent',v:KSH(tS),s:'Actual',c:'or',cls:'or'}].map(s=>`<div class="sbox ${s.cls}"><div class="sl">${s.l}</div><div class="sv ${s.c}">${s.v}</div><div class="ss">${s.s}</div></div>`).join('');
+  document.getElementById('repProg').innerHTML=projects.map(p=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><div style="font-size:.79rem;font-weight:600">${p.name}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:.93rem;color:var(--or3)">${p.progress||0}%</div></div><div class="pbar"><div class="pbar-fill" style="width:${p.progress||0}%"></div></div><div style="font-size:.58rem;color:var(--muted);margin-top:2px">${p.phase||'—'} · ${p.status}</div></div>`).join('')||'<div class="empty"><span class="empty-i">🏗</span>No projects</div>';
   const months=[];for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);months.push({lbl:d.toLocaleDateString('en-KE',{month:'short'}).toUpperCase(),m:d.getMonth(),y:d.getFullYear()});}
-  const mV=months.map(mo=>materials.filter(m=>{const d=new Date(m.date);return d.getMonth()===mo.m&&d.getFullYear()===mo.y;}).reduce((s,m)=>s+(m.total_cost||0),0));
-  const maxM=Math.max(...mV,1);
+  const mV=months.map(mo=>materials.filter(m=>{const d=new Date(m.date);return d.getMonth()===mo.m&&d.getFullYear()===mo.y;}).reduce((s,m)=>s+(m.total_cost||0),0));const maxM=Math.max(...mV,1);
   document.getElementById('repChart').innerHTML=months.map((mo,i)=>{const v=mV[i];const h=Math.max(3,(v/maxM*108)).toFixed(1);return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div style="font-size:.55rem;color:var(--or3);font-family:'IBM Plex Mono',monospace">${v>0?Math.round(v/1000)+'k':''}</div><div style="width:100%;background:linear-gradient(180deg,var(--or2),var(--or3));border-radius:2px 2px 0 0;min-height:3px;height:${h}px"></div><div style="font-size:.55rem;color:var(--muted);font-family:'IBM Plex Mono',monospace">${mo.lbl}</div></div>`;}).join('');
-  const byP={};workers.forEach(w=>{const n=pname(w.project_id);byP[n]=(byP[n]||0)+1;});
-  const maxW=Math.max(...Object.values(byP),1);
+  const byP={};workers.forEach(w=>{const n=pname(w.project_id);byP[n]=(byP[n]||0)+1;});const maxW=Math.max(...Object.values(byP),1);
   document.getElementById('repWorkers').innerHTML=Object.entries(byP).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><div style="min-width:115px;font-size:.7rem;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n}</div><div style="flex:1;background:var(--border);border-radius:2px;height:9px;overflow:hidden"><div style="height:100%;width:${(v/maxW*100).toFixed(1)}%;background:linear-gradient(90deg,var(--or2),var(--or3));border-radius:2px"></div></div><div style="min-width:28px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:.93rem;color:var(--or3)">${v}</div></div>`).join('')||'<div class="empty"><span class="empty-i">👷</span>No data</div>';
-  const cD={};materials.forEach(m=>{cD[m.category]=(cD[m.category]||0)+(m.total_cost||0);});
-  const maxC=Math.max(...Object.values(cD),1);
+  const cD={};materials.forEach(m=>{cD[m.category]=(cD[m.category]||0)+(m.total_cost||0);});const maxC=Math.max(...Object.values(cD),1);
   document.getElementById('repMats').innerHTML=Object.entries(cD).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([c,v])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><div style="min-width:82px;font-size:.7rem;color:var(--muted2)">${c}</div><div style="flex:1;background:var(--border);border-radius:2px;height:9px;overflow:hidden"><div style="height:100%;width:${(v/maxC*100).toFixed(1)}%;background:linear-gradient(90deg,var(--ye2),var(--ye));border-radius:2px"></div></div><div style="min-width:82px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:.87rem;color:var(--ye)">${KSH(v)}</div></div>`).join('')||'<div class="empty"><span class="empty-i">🧱</span>No data</div>';
 }
 
-// SETUP
 function renderSetup(){
   document.getElementById('sBiz').value=sett.biz||'';document.getElementById('sMgr').value=sett.mgr||'';document.getElementById('sPh').value=sett.ph||'';document.getElementById('sLoc').value=sett.loc||'';
   document.getElementById('sqlOut').textContent=`-- SITEFORGE SQL — Run each block in Supabase SQL Editor
@@ -1093,13 +1211,11 @@ ALTER PUBLICATION supabase_realtime ADD TABLE
 function saveSett(){sett.biz=document.getElementById('sBiz').value||'SiteForge';sett.mgr=document.getElementById('sMgr').value;sett.ph=document.getElementById('sPh').value;sett.loc=document.getElementById('sLoc').value;localStorage.setItem('sf_sett',JSON.stringify(sett));document.getElementById('bizTitle').textContent=sett.biz.toUpperCase();toast('SAVED','gr');}
 function cpSql(){navigator.clipboard.writeText(document.getElementById('sqlOut').textContent).then(()=>toast('SQL COPIED','gr')).catch(()=>toast('SELECT MANUALLY','rd'));}
 
-// SAVES
 async function saveProj(){
   const name=document.getElementById('pjN').value.trim();if(!name){toast('Enter project name','rd');return;}
   const rec={id:Date.now(),name,client:document.getElementById('pjCl').value,location:document.getElementById('pjLoc').value,type:document.getElementById('pjTyp').value,start_date:document.getElementById('pjSD').value,end_date:document.getElementById('pjED').value,budget:parseFloat(document.getElementById('pjBgt').value)||0,status:document.getElementById('pjSt').value,phase:curPhase,progress:parseInt(document.getElementById('pjProg').value)||0,notes:document.getElementById('pjNo').value,created_at:new Date().toISOString()};
   try{const{data,error}=await sb.from('construction_projects').insert(rec).select().single();if(error)throw error;projects=[data,...projects];online();}catch(e){projects=[rec,...projects];offline();}
-  cm('mAddProj');['pjN','pjCl','pjLoc','pjBgt','pjNo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  renderProjects();fillSels();updateRibbon();toast(`🏗 ${name} CREATED!`,'gr');
+  cm('mAddProj');['pjN','pjCl','pjLoc','pjBgt','pjNo'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});renderProjects();fillSels();updateRibbon();toast(`🏗 ${name} CREATED!`,'gr');
 }
 async function saveTask(){
   const name=document.getElementById('tkN').value.trim();const pid=document.getElementById('tkP').value;if(!name||!pid){toast('Fill name and project','rd');return;}
@@ -1133,7 +1249,6 @@ async function savePhoto(){
   cm('mAddPhoto');loadPhotos();toast('📷 UPDATE SAVED','gr');
 }
 
-// INIT
 async function init(){
   try{const s=localStorage.getItem('sf_sett');if(s)Object.assign(sett,JSON.parse(s));}catch(e){}
   document.getElementById('bizTitle').textContent=(sett.biz||'SITEFORGE').toUpperCase();
@@ -1153,7 +1268,8 @@ async function init(){
   }catch(e){offline();}
   fillSels();renderDash();renderSetup();
 }
-init();
+
+if(sessionStorage.getItem('siteforge_unlocked')==='1'){init();}
 </script>
 </body>
 </html>
