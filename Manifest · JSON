@@ -1,0 +1,46 @@
+{
+  "name": "SiteForge Construction Manager",
+  "short_name": "SiteForge",
+  "description": "Construction project management — tasks, workers, materials, budget & issues",
+  "start_url": "/SITEFORGE-Construction-Manager/index.html",
+  "scope": "/SITEFORGE-Construction-Manager/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e0c0a",
+  "theme_color": "#e8650a",
+  "lang": "en",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/SITEFORGE-Construction-Manager/icons/icon-72x72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "/SITEFORGE-Construction-Manager/icons/icon-96x96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "/SITEFORGE-Construction-Manager/icons/icon-128x128.png", "sizes": "128x128", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/SITEFORGE-Construction-Manager/icons/icon-144x144.png", "sizes": "144x144", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/SITEFORGE-Construction-Manager/icons/icon-152x152.png", "sizes": "152x152", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/SITEFORGE-Construction-Manager/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/SITEFORGE-Construction-Manager/icons/icon-384x384.png", "sizes": "384x384", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/SITEFORGE-Construction-Manager/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View project overview",
+      "url": "/SITEFORGE-Construction-Manager/index.html#dash",
+      "icons": [{ "src": "/SITEFORGE-Construction-Manager/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "New Project",
+      "short_name": "Project",
+      "description": "Add a new construction project",
+      "url": "/SITEFORGE-Construction-Manager/index.html#projects",
+      "icons": [{ "src": "/SITEFORGE-Construction-Manager/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Log Material",
+      "short_name": "Materials",
+      "description": "Record material purchase",
+      "url": "/SITEFORGE-Construction-Manager/index.html#materials",
+      "icons": [{ "src": "/SITEFORGE-Construction-Manager/icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ]
+}
