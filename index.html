@@ -300,6 +300,7 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
 .btn-mp{background:var(--mpesa);color:#000;}.btn-mp:hover{background:var(--mpesa3);}
 .btn-rd{background:var(--red);color:#fff;}
 .btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border);}.btn-ghost:hover{border-color:var(--or2);}
+.btn-print{background:rgba(58,159,212,.12);color:var(--sky);border:1px solid rgba(58,159,212,.3);}.btn-print:hover{background:rgba(58,159,212,.22);border-color:var(--sky);}
 .btn-sm{padding:5px 10px;font-size:.74rem;}
 .btn-xs{padding:2px 7px;font-size:.68rem;}
 
@@ -353,9 +354,110 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
   color:var(--mpesa3);letter-spacing:2px;
   margin-bottom:13px;display:flex;align-items:center;gap:7px;
 }
+
+/* ===================== PRINT STYLES ===================== */
+@media print {
+  /* Hide everything by default */
+  body > *:not(#printFrame) { display: none !important; }
+  #printFrame { display: block !important; }
+  
+  @page {
+    size: A4;
+    margin: 15mm 12mm 18mm 12mm;
+  }
+}
+
+/* Print frame — hidden on screen, shown on print */
+#printFrame {
+  display: none;
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: #111;
+  background: #fff;
+}
+
+/* Print document styles (scoped inside #printFrame) */
+#printFrame .pr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 3px solid #e8650a;
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+#printFrame .pr-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+#printFrame .pr-logo-mark {
+  width: 48px; height: 48px;
+  background: #e8650a;
+  clip-path: polygon(0 0,100% 0,100% 75%,75% 100%,0 100%);
+  display: grid; place-items: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+#printFrame .pr-company { font-size: 1.4rem; font-weight: 700; letter-spacing: 2px; font-family: 'Bebas Neue', sans-serif; color: #1a1a1a; }
+#printFrame .pr-sub { font-size: 0.58rem; color: #e8650a; letter-spacing: 3px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; }
+#printFrame .pr-meta { text-align: right; font-size: 0.72rem; color: #555; font-family: 'IBM Plex Mono', monospace; line-height: 1.7; }
+#printFrame .pr-meta strong { color: #e8650a; }
+#printFrame .pr-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: #e8650a; letter-spacing: 3px; margin: 0 0 14px 0; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+#printFrame .pr-title.mp-title { color: #00a000; border-bottom-color: #00a000; }
+#printFrame .pr-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 18px;
+}
+#printFrame .pr-stat {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 9px 11px;
+  background: #f9f9f9;
+}
+#printFrame .pr-stat-label { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1.5px; color: #888; font-family: 'IBM Plex Mono', monospace; margin-bottom: 2px; }
+#printFrame .pr-stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: #1a1a1a; letter-spacing: 1px; }
+#printFrame .pr-stat-value.or { color: #e8650a; }
+#printFrame .pr-stat-value.gr { color: #1a9a60; }
+#printFrame .pr-stat-value.rd { color: #c0392b; }
+#printFrame .pr-stat-value.mp { color: #007a00; }
+
+/* Print table */
+#printFrame table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 0.78rem; }
+#printFrame thead tr { background: #1a1a1a; }
+#printFrame thead th { color: #fff; padding: 7px 10px; text-align: left; font-size: 0.58rem; letter-spacing: 1px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+#printFrame tbody tr:nth-child(even) td { background: #f5f5f5; }
+#printFrame tbody tr td { padding: 7px 10px; border-bottom: 1px solid #e8e8e8; vertical-align: middle; }
+#printFrame tbody tr:last-child td { border-bottom: none; }
+#printFrame .pr-total-row td { background: #1a1a1a !important; color: #fff; font-weight: 700; font-size: 0.82rem; }
+#printFrame .pr-total-row td.amt { color: #33cc33; font-family: 'Bebas Neue', sans-serif; font-size: 1rem; }
+#printFrame .pr-total-row td.amt-or { color: #ff8c3a; font-family: 'Bebas Neue', sans-serif; font-size: 1rem; }
+
+/* Progress bar for print */
+#printFrame .pr-bar-wrap { background: #e0e0e0; border-radius: 3px; height: 8px; overflow: hidden; }
+#printFrame .pr-bar-fill { height: 100%; background: #e8650a; border-radius: 3px; }
+
+/* Project cards for print */
+#printFrame .pr-proj-row { border: 1px solid #ddd; border-left: 4px solid #e8650a; border-radius: 6px; padding: 10px 13px; margin-bottom: 8px; }
+#printFrame .pr-proj-name { font-weight: 700; font-size: 0.88rem; margin-bottom: 3px; }
+#printFrame .pr-proj-meta { font-size: 0.68rem; color: #666; margin-bottom: 6px; }
+#printFrame .pr-proj-pct { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: #e8650a; float: right; margin-top: -22px; }
+
+/* Section separator */
+#printFrame .pr-section { margin-top: 20px; }
+#printFrame .pr-footer { margin-top: 24px; border-top: 1px solid #ddd; padding-top: 10px; font-size: 0.63rem; color: #aaa; font-family: 'IBM Plex Mono', monospace; display: flex; justify-content: space-between; }
+
+/* M-Pesa badge colours for print */
+#printFrame .badge-sent { background: #d4f5e0; color: #0a7a3a; padding: 2px 7px; border-radius: 3px; font-size: 0.63rem; font-weight: 600; font-family: 'IBM Plex Mono', monospace; }
+#printFrame .badge-pending { background: #fff8d4; color: #8a6a00; padding: 2px 7px; border-radius: 3px; font-size: 0.63rem; font-weight: 600; }
+#printFrame .badge-failed { background: #fde8e8; color: #a00; padding: 2px 7px; border-radius: 3px; font-size: 0.63rem; font-weight: 600; }
+#printFrame .mpesa-code-pr { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: #007a00; }
 </style>
 </head>
 <body>
+
+<!-- HIDDEN PRINT FRAME -->
+<div id="printFrame"></div>
 
 <!-- LOGIN OVERLAY -->
 <div id="loginOverlay">
@@ -568,7 +670,10 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
 <div class="tab" id="tab-mpesa">
   <div class="frow-act">
     <div class="sec mpesa-sec" style="margin:0">📱 M-Pesa Payments to Contractors</div>
-    <button class="btn btn-mp" onclick="om('mAddMpesa')">＋ Record Payment</button>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="btn btn-print btn-sm" onclick="printMpesa()">🖨 Print Register</button>
+      <button class="btn btn-mp" onclick="om('mAddMpesa')">＋ Record Payment</button>
+    </div>
   </div>
 
   <!-- Summary Stats -->
@@ -629,7 +734,10 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
 
 <!-- REPORTS -->
 <div class="tab" id="tab-reports">
-  <div class="sec">📈 Reports</div>
+  <div class="frow-act">
+    <div class="sec" style="margin:0">📈 Reports</div>
+    <button class="btn btn-print btn-sm" onclick="printReports()">🖨 Print Report</button>
+  </div>
   <div class="sg" id="repSg"></div>
   <div class="g2">
     <div class="card"><div class="card-title">📊 Project Progress</div><div id="repProg"></div></div>
@@ -822,7 +930,6 @@ input[type=range]{padding:3px 0;accent-color:var(--or);}
 <div class="mbd" id="mAddMpesa">
   <div class="modal mpesa-modal">
     <div class="mtitle mp">📱 RECORD M-PESA PAYMENT</div>
-    <!-- Amount (prominent) -->
     <div class="frow">
       <div class="fg">
         <label>Amount Sent (KSh) *</label>
@@ -1340,7 +1447,6 @@ async function saveMpesa(){
     offline();
   }
   cm('mAddMpesa');
-  // Reset form
   ['mpAmt','mpCode','mpName','mpPhone','mpNotes'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('mpDate').value=today();
   renderMpesaList(mpesaPayments);
@@ -1357,6 +1463,285 @@ async function delMpesa(id){
   renderMpesaSg();
   updateRibbon();
   toast('Deleted','rd');
+}
+
+// ===================== PRINT FUNCTIONS =====================
+
+function buildPrintHeader(title, subtitle) {
+  const now = new Date().toLocaleDateString('en-KE', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  const time = new Date().toLocaleTimeString('en-KE');
+  return `
+    <div class="pr-header">
+      <div class="pr-logo-row">
+        <div class="pr-logo-mark">🏗</div>
+        <div>
+          <div class="pr-company">${(sett.biz||'SITEFORGE').toUpperCase()}</div>
+          <div class="pr-sub">Construction Manager${sett.mgr?' · '+sett.mgr:''}</div>
+        </div>
+      </div>
+      <div class="pr-meta">
+        <div><strong>${title}</strong></div>
+        <div>${subtitle||''}</div>
+        <div>Printed: ${now}</div>
+        <div>Time: ${time}</div>
+        ${sett.ph?`<div>Tel: ${sett.ph}</div>`:''}
+        ${sett.loc?`<div>${sett.loc}</div>`:''}
+      </div>
+    </div>`;
+}
+
+function printReports() {
+  const totalB = projects.reduce((s,p)=>s+(p.budget||0),0);
+  const matC = materials.reduce((s,m)=>s+(m.total_cost||0),0);
+  const labC = workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
+  const mpC = mpesaPayments.filter(p=>p.status==='sent').reduce((s,p)=>s+(p.amount||0),0);
+  const totalSpent = matC + labC;
+  const rem = Math.max(0, totalB - totalSpent);
+  const avgProg = projects.length ? Math.round(projects.reduce((s,p)=>s+(p.progress||0),0)/projects.length) : 0;
+  const done = tasks.filter(t=>t.status==='done').length;
+  const openIssues = issues.filter(i=>i.status!=='resolved').length;
+
+  // Stats section
+  const stats = `
+    <div class="pr-stats">
+      <div class="pr-stat"><div class="pr-stat-label">Total Projects</div><div class="pr-stat-value or">${projects.length}</div></div>
+      <div class="pr-stat"><div class="pr-stat-label">Avg Progress</div><div class="pr-stat-value or">${avgProg}%</div></div>
+      <div class="pr-stat"><div class="pr-stat-label">Tasks Done</div><div class="pr-stat-value gr">${done} / ${tasks.length}</div></div>
+      <div class="pr-stat"><div class="pr-stat-label">Open Issues</div><div class="pr-stat-value rd">${openIssues}</div></div>
+      <div class="pr-stat"><div class="pr-stat-label">Total Budget</div><div class="pr-stat-value">${KSH(totalB)}</div></div>
+      <div class="pr-stat"><div class="pr-stat-label">Total Spent</div><div class="pr-stat-value or">${KSH(totalSpent)}</div></div>
+      <div class="pr-stat"><div class="pr-stat-label">Remaining</div><div class="pr-stat-value gr">${KSH(rem)}</div></div>
+      <div class="pr-stat"><div class="pr-stat-label">M-Pesa Paid</div><div class="pr-stat-value mp">${KSH(mpC)}</div></div>
+    </div>`;
+
+  // Projects table
+  const projRows = projects.map(p => {
+    const pSpent = materials.filter(m=>m.project_id===p.id).reduce((s,m)=>s+(m.total_cost||0),0)
+                 + workers.filter(w=>w.project_id===p.id).reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
+    const bPct = p.budget ? Math.min(100,Math.round(pSpent/p.budget*100)) : 0;
+    const pMp = mpesaPayments.filter(m=>m.project_id===p.id&&m.status==='sent').reduce((s,m)=>s+(m.amount||0),0);
+    const pTasks = tasks.filter(t=>t.project_id===p.id);
+    const pDone = pTasks.filter(t=>t.status==='done').length;
+    return `<tr>
+      <td><strong>${p.name}</strong><br><span style="font-size:0.68rem;color:#666">${p.client||''} · ${p.location||''}</span></td>
+      <td>${p.type||'residential'}</td>
+      <td><span style="text-transform:capitalize">${p.status}</span></td>
+      <td style="text-transform:capitalize">${p.phase||'—'}</td>
+      <td>
+        <div style="font-weight:700;color:#e8650a">${p.progress||0}%</div>
+        <div class="pr-bar-wrap" style="margin-top:3px;width:80px">
+          <div class="pr-bar-fill" style="width:${p.progress||0}%"></div>
+        </div>
+      </td>
+      <td>${KSH(p.budget)}</td>
+      <td>${KSH(pSpent)} <span style="color:${bPct>80?'#c0392b':'#777'};font-size:0.72rem">(${bPct}%)</span></td>
+      <td style="color:#007a00;font-weight:600">${KSH(pMp)}</td>
+      <td>${pDone}/${pTasks.length}</td>
+      <td>${p.start_date||'—'}</td>
+      <td>${p.end_date||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  // Workers summary
+  const workerRows = workers.map(w => {
+    const earned = (w.daily_rate||0)*(w.days_worked||0);
+    return `<tr>
+      <td><strong>${w.name}</strong></td>
+      <td>${w.role}</td>
+      <td>${pname(w.project_id)}</td>
+      <td>${w.phone||'—'}</td>
+      <td>${KSH(w.daily_rate)}</td>
+      <td>${w.days_worked||0}</td>
+      <td style="font-weight:700;color:#1a7a50">${KSH(earned)}</td>
+    </tr>`;
+  }).join('');
+  const totalPayroll = workers.reduce((s,w)=>s+(w.daily_rate||0)*(w.days_worked||0),0);
+
+  // Material category summary
+  const cats=['cement','steel','timber','sand','blocks','roofing','plumbing','electrical','finishing','other'];
+  const matCatRows = cats.map(c=>{
+    const v = materials.filter(m=>m.category===c).reduce((s,m)=>s+(m.total_cost||0),0);
+    if(!v) return '';
+    return `<tr><td style="text-transform:capitalize">${c}</td><td style="font-weight:600">${KSH(v)}</td></tr>`;
+  }).join('');
+
+  const html = `
+    ${buildPrintHeader('PROJECT PROGRESS REPORT', 'All Projects Summary')}
+
+    <div class="pr-title">📊 SUMMARY STATISTICS</div>
+    ${stats}
+
+    <div class="pr-title">🏗 ALL PROJECTS</div>
+    <table>
+      <thead><tr>
+        <th>Project</th><th>Type</th><th>Status</th><th>Phase</th>
+        <th>Progress</th><th>Budget</th><th>Spent</th>
+        <th>M-Pesa Paid</th><th>Tasks</th><th>Start</th><th>End</th>
+      </tr></thead>
+      <tbody>
+        ${projRows || '<tr><td colspan="11" style="text-align:center;color:#999">No projects</td></tr>'}
+        <tr class="pr-total-row">
+          <td colspan="5"><strong>TOTALS</strong></td>
+          <td class="amt-or">${KSH(totalB)}</td>
+          <td class="amt-or">${KSH(totalSpent)}</td>
+          <td class="amt">${KSH(mpC)}</td>
+          <td colspan="3"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pr-section">
+      <div class="pr-title">👷 WORKERS PAYROLL SUMMARY</div>
+      <table>
+        <thead><tr><th>Name</th><th>Role</th><th>Project</th><th>Phone</th><th>Daily Rate</th><th>Days</th><th>Total Earned</th></tr></thead>
+        <tbody>
+          ${workerRows || '<tr><td colspan="7" style="text-align:center;color:#999">No workers</td></tr>'}
+          <tr class="pr-total-row">
+            <td colspan="6"><strong>TOTAL PAYROLL</strong></td>
+            <td class="amt-or">${KSH(totalPayroll)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pr-section">
+      <div class="pr-title">🧱 MATERIAL SPEND BY CATEGORY</div>
+      <table>
+        <thead><tr><th>Category</th><th>Total Spend (KSh)</th></tr></thead>
+        <tbody>
+          ${matCatRows || '<tr><td colspan="2" style="text-align:center;color:#999">No materials</td></tr>'}
+          <tr class="pr-total-row">
+            <td><strong>TOTAL MATERIALS</strong></td>
+            <td class="amt-or">${KSH(matC)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pr-footer">
+      <span>${(sett.biz||'SiteForge').toUpperCase()} — CONFIDENTIAL</span>
+      <span>Generated by SiteForge Construction Manager</span>
+    </div>`;
+
+  document.getElementById('printFrame').innerHTML = html;
+  setTimeout(() => { window.print(); }, 150);
+}
+
+function printMpesa() {
+  // Apply any active filters
+  const fp = document.getElementById('mpesaFP')?.value || '';
+  const fc = document.getElementById('mpesaFC')?.value || '';
+  const fs = document.getElementById('mpesaSrch')?.value?.toLowerCase() || '';
+
+  let list = [...mpesaPayments];
+  if (fp) list = list.filter(p => p.project_id == parseInt(fp));
+  if (fc) list = list.filter(p => p.payment_type === fc);
+  if (fs) list = list.filter(p => (p.contractor_name||'').toLowerCase().includes(fs));
+
+  const totalSent = list.filter(p=>p.status==='sent').reduce((s,p)=>s+(p.amount||0),0);
+  const totalPending = list.filter(p=>p.status==='pending').reduce((s,p)=>s+(p.amount||0),0);
+  const totalAll = list.reduce((s,p)=>s+(p.amount||0),0);
+
+  // Group by project for sub-totals
+  const byProj = {};
+  list.forEach(p => {
+    const key = pname(p.project_id);
+    if (!byProj[key]) byProj[key] = [];
+    byProj[key].push(p);
+  });
+
+  // Filter label
+  let filterDesc = 'All Payments';
+  if (fp) filterDesc = `Project: ${pname(parseInt(fp))}`;
+  if (fc) filterDesc += (fp ? ' · ' : '') + 'Type: ' + fc;
+
+  // Stats
+  const n = new Date(); const mo = n.getMonth(); const yr = n.getFullYear();
+  const thisMonth = list.filter(p=>{
+    if(!p.date||p.status!=='sent') return false;
+    const d = new Date(p.date);
+    return d.getMonth()===mo && d.getFullYear()===yr;
+  }).reduce((s,p)=>s+(p.amount||0),0);
+
+  const stats = `
+    <div class="pr-stats">
+      <div class="pr-stat"><div class="pr-stat-label">Total Records</div><div class="pr-stat-value">${list.length}</div></div>
+      <div class="pr-stat"><div class="pr-stat-label">Total Sent</div><div class="pr-stat-value mp">${KSH(totalSent)}</div></div>
+      <div class="pr-stat"><div class="pr-stat-label">Pending</div><div class="pr-stat-value" style="color:#8a6a00">${KSH(totalPending)}</div></div>
+      <div class="pr-stat"><div class="pr-stat-label">This Month</div><div class="pr-stat-value gr">${KSH(thisMonth)}</div></div>
+    </div>`;
+
+  // Main payments table
+  const rows = list.map((p,i) => {
+    const badgeClass = p.status==='sent' ? 'badge-sent' : p.status==='failed' ? 'badge-failed' : 'badge-pending';
+    return `<tr>
+      <td style="color:#888;font-family:'IBM Plex Mono',monospace;font-size:0.7rem">${i+1}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem">${p.date||'—'}</td>
+      <td><strong>${p.contractor_name}</strong>${p.phone?`<br><span style="font-size:0.65rem;color:#888">${p.phone}</span>`:''}</td>
+      <td>${pname(p.project_id)}</td>
+      <td style="text-transform:capitalize">${p.payment_type||'payment'}</td>
+      <td>${p.transaction_code ? `<span class="mpesa-code-pr">${p.transaction_code}</span>` : '<span style="color:#aaa">—</span>'}</td>
+      <td><span class="${badgeClass}">${p.status}</span></td>
+      <td style="text-align:right;font-weight:700;font-size:0.92rem;color:${p.status==='sent'?'#007a00':'#888'}">${KSH(p.amount)}</td>
+      <td style="font-size:0.68rem;color:#666;max-width:120px">${p.notes||''}</td>
+    </tr>`;
+  }).join('');
+
+  // By-project summary
+  const projSummary = Object.entries(byProj).map(([proj, pmts]) => {
+    const projTotal = pmts.filter(p=>p.status==='sent').reduce((s,p)=>s+(p.amount||0),0);
+    return `<tr>
+      <td><strong>${proj}</strong></td>
+      <td>${pmts.length}</td>
+      <td style="font-weight:700;color:#007a00">${KSH(projTotal)}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `
+    ${buildPrintHeader('M-PESA PAYMENTS REGISTER', filterDesc)}
+
+    <div class="pr-title mp-title">📱 M-PESA PAYMENTS SUMMARY</div>
+    ${stats}
+
+    <div class="pr-title mp-title">💳 PAYMENT RECORDS</div>
+    <table>
+      <thead><tr>
+        <th>#</th><th>Date</th><th>Contractor / Recipient</th>
+        <th>Project</th><th>Payment Type</th><th>M-Pesa Code</th>
+        <th>Status</th><th style="text-align:right">Amount (KSh)</th><th>Notes</th>
+      </tr></thead>
+      <tbody>
+        ${rows || '<tr><td colspan="9" style="text-align:center;color:#999;padding:18px">No payments found</td></tr>'}
+        <tr class="pr-total-row">
+          <td colspan="7"><strong>TOTAL SENT</strong></td>
+          <td class="amt" style="text-align:right">${KSH(totalSent)}</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pr-section">
+      <div class="pr-title mp-title">📊 BY PROJECT</div>
+      <table>
+        <thead><tr><th>Project</th><th>Payments</th><th>Total Paid</th></tr></thead>
+        <tbody>
+          ${projSummary || '<tr><td colspan="3" style="text-align:center;color:#999">No data</td></tr>'}
+          <tr class="pr-total-row">
+            <td><strong>GRAND TOTAL</strong></td>
+            <td>${list.length}</td>
+            <td class="amt">${KSH(totalSent)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pr-footer">
+      <span>${(sett.biz||'SiteForge').toUpperCase()} — M-PESA PAYMENT REGISTER — CONFIDENTIAL</span>
+      <span>Generated by SiteForge Construction Manager</span>
+    </div>`;
+
+  document.getElementById('printFrame').innerHTML = html;
+  setTimeout(() => { window.print(); }, 150);
 }
 
 // ===================== ISSUES =====================
